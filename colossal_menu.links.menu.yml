@@ -14,3 +14,11 @@ entity.colossal_menu_link_type.collection:
   parent: system.admin_structure
   weight: 99
 
+# Menu menu items definition
+entity.colossal_menu.collection:
+  title: 'Menu'
+  route_name: entity.colossal_menu.collection
+  description: 'List Menu (bundles)'
+  parent: system.admin_structure
+  weight: 99
+

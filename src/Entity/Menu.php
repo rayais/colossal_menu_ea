@@ -1,0 +1,61 @@
+<?php
+
+/**
+ * @file
+ * Contains \Drupal\colossal_menu\Entity\Menu.
+ */
+
+namespace Drupal\colossal_menu\Entity;
+
+use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
+use Drupal\colossal_menu\MenuInterface;
+
+/**
+ * Defines the Menu entity.
+ *
+ * @ConfigEntityType(
+ *   id = "colossal_menu",
+ *   label = @Translation("Menu"),
+ *   handlers = {
+ *     "list_builder" = "Drupal\colossal_menu\MenuListBuilder",
+ *     "form" = {
+ *       "add" = "Drupal\colossal_menu\Form\MenuForm",
+ *       "edit" = "Drupal\colossal_menu\Form\MenuForm",
+ *       "delete" = "Drupal\colossal_menu\Form\MenuDeleteForm"
+ *     },
+ *     "route_provider" = {
+ *       "html" = "Drupal\colossal_menu\MenuHtmlRouteProvider",
+ *     },
+ *   },
+ *   config_prefix = "colossal_menu",
+ *   admin_permission = "administer site configuration",
+ *   entity_keys = {
+ *     "id" = "id",
+ *     "label" = "label",
+ *     "uuid" = "uuid"
+ *   },
+ *   links = {
+ *     "canonical" = "/admin/structure/colossal_menu/{colossal_menu}",
+ *     "add-form" = "/admin/structure/colossal_menu/add",
+ *     "edit-form" = "/admin/structure/colossal_menu/{colossal_menu}/edit",
+ *     "delete-form" = "/admin/structure/colossal_menu/{colossal_menu}/delete",
+ *     "collection" = "/admin/structure/colossal_menu"
+ *   }
+ * )
+ */
+class Menu extends ConfigEntityBundleBase implements MenuInterface {
+  /**
+   * The Menu ID.
+   *
+   * @var string
+   */
+  protected $id;
+
+  /**
+   * The Menu label.
+   *
+   * @var string
+   */
+  protected $label;
+
+}

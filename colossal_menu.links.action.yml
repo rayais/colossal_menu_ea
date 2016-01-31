@@ -1,0 +1,13 @@
+entity.colossal_menu_link.add_form:
+  route_name: 'colossal_menu_link.add_page'
+  title: 'Add Link'
+  appears_on:
+    - entity.colossal_menu_link.collection
+    - entity.colossal_menu_link.canonical
+
+entity.colossal_menu_link_type.add_form:
+  route_name: 'entity.colossal_menu_link_type.add_form'
+  title: 'Add Link type'
+  appears_on:
+    - entity.colossal_menu_link_type.collection
+

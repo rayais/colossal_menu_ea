@@ -1,0 +1,17 @@
+# Link routing definition
+entity.colossal_menu_link.canonical:
+  route_name: entity.colossal_menu_link.canonical
+  base_route: entity.colossal_menu_link.canonical
+  title: 'View'
+
+entity.colossal_menu_link.edit_form:
+  route_name: entity.colossal_menu_link.edit_form
+  base_route: entity.colossal_menu_link.canonical
+  title: Edit
+
+entity.colossal_menu_link.delete_form:
+  route_name:  entity.colossal_menu_link.delete_form
+  base_route:  entity.colossal_menu_link.canonical
+  title: Delete
+  weight: 10
+

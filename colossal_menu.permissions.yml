@@ -1,0 +1,19 @@
+add link entities:
+  title: 'Create new Link entities'
+
+administer link entities:
+  title: 'Administer Link entities'
+  description: 'Allow to access the administration form to configure Link entities.'
+  restrict access: true
+
+delete link entities:
+  title: 'Delete Link entities'
+
+edit link entities:
+  title: 'Edit Link entities'
+
+view published link entities:
+  title: 'View published Link entities'
+
+view unpublished link entities:
+  title: 'View unpublished Link entities'

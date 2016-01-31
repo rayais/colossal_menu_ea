@@ -27,7 +27,7 @@ use Drupal\colossal_menu\LinkTypeInterface;
  *       "html" = "Drupal\colossal_menu\LinkTypeHtmlRouteProvider",
  *     },
  *   },
- *   config_prefix = "colossal_menu_link_type",
+ *   config_prefix = "link_type",
  *   admin_permission = "administer site configuration",
  *   bundle_of = "colossal_menu_link",
  *   entity_keys = {
@@ -36,11 +36,11 @@ use Drupal\colossal_menu\LinkTypeInterface;
  *     "uuid" = "uuid"
  *   },
  *   links = {
- *     "canonical" = "/admin/structure/colossal_menu_link_type/{colossal_menu_link_type}",
- *     "add-form" = "/admin/structure/colossal_menu_link_type/add",
- *     "edit-form" = "/admin/structure/colossal_menu_link_type/{colossal_menu_link_type}/edit",
- *     "delete-form" = "/admin/structure/colossal_menu_link_type/{colossal_menu_link_type}/delete",
- *     "collection" = "/admin/structure/colossal_menu_link_type"
+ *     "canonical" = "/admin/structure/colossal_menu/link_type/{colossal_menu_link_type}",
+ *     "add-form" = "/admin/structure/colossal_menu/link_type/add",
+ *     "edit-form" = "/admin/structure/colossal_menu/link_type/{colossal_menu_link_type}/edit",
+ *     "delete-form" = "/admin/structure/colossal_menu/link_type/{colossal_menu_link_type}/delete",
+ *     "collection" = "/admin/structure/colossal_menu/link_type"
  *   }
  * )
  */

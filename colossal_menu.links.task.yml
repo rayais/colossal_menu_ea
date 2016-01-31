@@ -1,4 +1,13 @@
-# Link routing definition
+entity.colossal_menu.collection:
+  title: 'Menus'
+  route_name: entity.colossal_menu.collection
+  base_route: entity.colossal_menu.collection
+
+entity.colossal_menu_link_type.collection:
+  title: 'Link types'
+  route_name: entity.colossal_menu_link_type.collection
+  base_route: entity.colossal_menu.collection
+
 entity.colossal_menu_link.canonical:
   route_name: entity.colossal_menu_link.canonical
   base_route: entity.colossal_menu_link.canonical
@@ -14,4 +23,3 @@ entity.colossal_menu_link.delete_form:
   base_route:  entity.colossal_menu_link.canonical
   title: Delete
   weight: 10
-

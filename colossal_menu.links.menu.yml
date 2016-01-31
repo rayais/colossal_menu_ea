@@ -1,24 +1,7 @@
-# Link menu items definition
-entity.colossal_menu_link.collection:
-  title: 'Link list'
-  route_name: entity.colossal_menu_link.collection
-  description: 'List Link entities'
-  parent: system.admin_structure
-  weight: 100
-
-# Link type menu items definition
-entity.colossal_menu_link_type.collection:
-  title: 'Link type'
-  route_name: entity.colossal_menu_link_type.collection
-  description: 'List Link type (bundles)'
-  parent: system.admin_structure
-  weight: 99
-
 # Menu menu items definition
 entity.colossal_menu.collection:
-  title: 'Menu'
+  title: 'Colossal Menus'
   route_name: entity.colossal_menu.collection
-  description: 'List Menu (bundles)'
+  description: 'Manage menus and menu links.'
   parent: system.admin_structure
   weight: 99
-

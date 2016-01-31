@@ -15,7 +15,7 @@ use Drupal\colossal_menu\MenuInterface;
  *
  * @ConfigEntityType(
  *   id = "colossal_menu",
- *   label = @Translation("Menu"),
+ *   label = @Translation("Colossal Menu"),
  *   handlers = {
  *     "list_builder" = "Drupal\colossal_menu\MenuListBuilder",
  *     "form" = {
@@ -27,7 +27,7 @@ use Drupal\colossal_menu\MenuInterface;
  *       "html" = "Drupal\colossal_menu\MenuHtmlRouteProvider",
  *     },
  *   },
- *   config_prefix = "colossal_menu",
+ *   config_prefix = "menu",
  *   admin_permission = "administer site configuration",
  *   entity_keys = {
  *     "id" = "id",

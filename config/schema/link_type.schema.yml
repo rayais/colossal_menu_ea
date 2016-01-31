@@ -1,6 +1,6 @@
-colossal_menu.colossal_menu.*:
+colossal_menu.link_type.*:
   type: config_entity
-  label: 'Menu config'
+  label: 'Link type config'
   mapping:
     id:
       type: string

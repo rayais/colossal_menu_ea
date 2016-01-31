@@ -51,11 +51,10 @@ use Drupal\user\UserInterface;
  *     "langcode" = "langcode",
  *   },
  *   links = {
- *     "canonical" = "/admin/structure/colossal_menu_link/{colossal_menu_link}",
- *     "add-form" = "/admin/structure/colossal_menu_link/add",
- *     "edit-form" = "/admin/structure/colossal_menu_link/{colossal_menu_link}/edit",
- *     "delete-form" = "/admin/structure/colossal_menu_link/{colossal_menu_link}/delete",
- *     "collection" = "/admin/structure/colossal_menu_link",
+ *     "canonical" = "/admin/structure/colossal_menu/{colossal_menu}/link/{colossal_menu_link}",
+ *     "add-form" = "/admin/structure/colossal_menu/{colossal_menu}/link/add",
+ *     "edit-form" = "/admin/structure/colossal_menu/{colossal_menu}/link/{colossal_menu_link}/edit",
+ *     "delete-form" = "/admin/structure/colossal_menu/{colossal_menu}/link/{colossal_menu_link}/delete",
  *   },
  *   bundle_entity_type = "colossal_menu_link_type",
  *   field_ui_base_route = "entity.colossal_menu_link_type.edit_form"

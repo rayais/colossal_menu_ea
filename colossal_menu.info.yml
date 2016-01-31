@@ -1,0 +1,5 @@
+name: Colossal Menu
+type: module
+description: Menu of epic proportions
+core: 8.x
+package: Menu

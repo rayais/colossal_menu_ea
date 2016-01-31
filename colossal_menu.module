@@ -1,3 +1,8 @@
+<?php
+/**
+ * @file
+ * Colossal Menu Hooks.
+ */
 
 /**
  * Implements hook_theme().

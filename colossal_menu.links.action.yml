@@ -1,4 +1,4 @@
-entity.colossal_menu_link.add_form:
+colossal_menu_link.add_page:
   route_name: 'colossal_menu_link.add_page'
   title: 'Add Link'
   appears_on:

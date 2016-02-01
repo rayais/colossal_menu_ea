@@ -53,7 +53,7 @@ use Drupal\user\UserInterface;
  *   links = {
  *     "canonical" = "/admin/structure/colossal_menu/{colossal_menu}/link/{colossal_menu_link}",
  *     "add-form" = "/admin/structure/colossal_menu/{colossal_menu}/link/add",
- *     "edit-form" = "/admin/structure/colossal_menu/{colossal_menu}/link/{colossal_menu_link}/edit",
+ *     "edit-form" = "/admin/structure/colossal_menu/{colossal_menu}/link/{colossal_menu_link}",
  *     "delete-form" = "/admin/structure/colossal_menu/{colossal_menu}/link/{colossal_menu_link}/delete",
  *   },
  *   bundle_entity_type = "colossal_menu_link_type",
@@ -77,6 +77,13 @@ class Link extends ContentEntityBase implements LinkInterface {
    */
   public function getType() {
     return $this->bundle();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getMenu() {
+    return $this->get('menu')->entity;
   }
 
   /**
@@ -157,6 +164,19 @@ class Link extends ContentEntityBase implements LinkInterface {
   /**
    * {@inheritdoc}
    */
+  protected function urlRouteParameters($rel) {
+    $params = parent::urlRouteParameters($rel);
+
+    if (in_array($rel, ['canonical', 'edit-form', 'delete-form'])) {
+      $params['colossal_menu'] = $this->getMenu()->id();
+    }
+
+    return $params;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields['id'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('ID'))
@@ -170,6 +190,14 @@ class Link extends ContentEntityBase implements LinkInterface {
     $fields['uuid'] = BaseFieldDefinition::create('uuid')
       ->setLabel(t('UUID'))
       ->setDescription(t('The UUID of the Link entity.'))
+      ->setReadOnly(TRUE);
+
+    $fields['menu'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Menu'))
+      ->setDescription(t('The menu of the Link entity.'))
+      ->setRevisionable(TRUE)
+      ->setSetting('target_type', 'colossal_menu')
+      ->setRequired(TRUE)
       ->setReadOnly(TRUE);
 
     $fields['user_id'] = BaseFieldDefinition::create('entity_reference')

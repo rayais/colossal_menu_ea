@@ -29,6 +29,14 @@ interface LinkInterface extends ContentEntityInterface, EntityChangedInterface, 
   public function getType();
 
   /**
+   * Gets the Menu.
+   *
+   * @return \Drupal\colossal_menu\MenuInterface
+   *   The Menu.
+   */
+  public function getMenu();
+
+  /**
    * Gets the Link name.
    *
    * @return string

@@ -16,15 +16,18 @@ use Drupal\Core\Form\FormStateInterface;
  * @ingroup colossal_menu
  */
 class LinkForm extends ContentEntityForm {
+
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
-    /* @var $entity \Drupal\colossal_menu\Entity\Link */
-    $form = parent::buildForm($form, $form_state);
-    $entity = $this->entity;
+  public function form(array $form, FormStateInterface $form_state) {
+    $link = $this->entity;
 
-    return $form;
+    if ($this->operation == 'edit') {
+      $form['#title'] = $this->t('Edit %label', array('%label' => $link->label()));
+    }
+
+    return parent::form($form, $form_state, $link);
   }
 
   /**
@@ -46,7 +49,11 @@ class LinkForm extends ContentEntityForm {
           '%label' => $entity->label(),
         ]));
     }
-    $form_state->setRedirect('entity.colossal_menu_link.edit_form', ['colossal_menu_link' => $entity->id()]);
+
+    $form_state->setRedirect('entity.colossal_menu_link.edit_form', [
+      'colossal_menu' => $entity->getMenu()->id(),
+      'colossal_menu_link' => $entity->id(),
+    ]);
   }
 
 }

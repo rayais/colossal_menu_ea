@@ -1,3 +1,22 @@
+# Menu
+entity.colossal_menu.collection:
+  path: '/admin/structure/colossal_menu'
+  defaults:
+    _entity_list: 'colossal_menu'
+    _title: 'Colossal Menu'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _permission: 'administer site configuration'
+
+entity.colossal_menu.add_form:
+  path: '/admin/structure/colossal_menu/add'
+  defaults:
+    _entity_form: 'colossal_menu.add'
+    _title: 'Add Colossal Menu'
+  requirements:
+    _entity_create_access: colossal_menu
+
 # Link
 entity.colossal_menu_link.add_form:
   path: '/admin/structure/colossal_menu/{colossal_menu}/link/add/{colossal_menu_link_type}'

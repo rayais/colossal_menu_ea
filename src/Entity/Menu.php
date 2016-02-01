@@ -24,7 +24,7 @@ use Drupal\colossal_menu\MenuInterface;
  *       "delete" = "Drupal\colossal_menu\Form\MenuDeleteForm"
  *     },
  *     "route_provider" = {
- *       "html" = "Drupal\colossal_menu\MenuHtmlRouteProvider",
+ *       "html" = "Drupal\Core\Entity\Routing\AdminHtmlRouteProvider",
  *     },
  *   },
  *   config_prefix = "menu",

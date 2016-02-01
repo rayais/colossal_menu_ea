@@ -7,9 +7,10 @@
 
 namespace Drupal\colossal_menu\Form;
 
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityForm;
+use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Class MenuForm.
@@ -17,34 +18,67 @@ use Drupal\Core\Form\FormStateInterface;
  * @package Drupal\colossal_menu\Form
  */
 class MenuForm extends EntityForm {
+
+  /**
+   * Entity Manager.
+   *
+   * @var \Drupal\Core\Entity\EntityManagerInterface
+   */
+  protected $entityManager;
+
+  /**
+   * Constructor.
+   */
+  public function __construct(EntityManagerInterface $entity_manager) {
+    $this->entityManager = $entity_manager;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('entity.manager')
+    );
+  }
+
   /**
    * {@inheritdoc}
    */
   public function form(array $form, FormStateInterface $form_state) {
-    $form = parent::form($form, $form_state);
+    $menu = $this->entity;
 
-    $colossal_menu = $this->entity;
     $form['label'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Label'),
       '#maxlength' => 255,
-      '#default_value' => $colossal_menu->label(),
+      '#default_value' => $menu->label(),
       '#description' => $this->t("Label for the Menu."),
       '#required' => TRUE,
     );
 
     $form['id'] = array(
       '#type' => 'machine_name',
-      '#default_value' => $colossal_menu->id(),
+      '#default_value' => $menu->id(),
       '#machine_name' => array(
         'exists' => '\Drupal\colossal_menu\Entity\Menu::load',
       ),
-      '#disabled' => !$colossal_menu->isNew(),
+      '#disabled' => !$menu->isNew(),
     );
 
-    /* You will need additional form elements for your custom properties. */
+    // Add menu links administration form for existing menus.
+    if (!$menu->isNew() || $menu->isLocked()) {
+      // Form API supports constructing and validating self-contained sections
+      // within forms, but does not allow handling the form section's submission
+      // equally separated yet. Therefore, we use a $form_state key to point to
+      // the parents of the form section.
+      // @see self::submitOverviewForm()
+      $form_state->set('menu_overview_form_parents', ['links']);
+      $form['links'] = array();
+      $form['links'] = $this->buildOverviewForm($form['links'], $form_state);
+    }
 
-    return $form;
+    return parent::form($form, $form_state);
   }
 
   /**
@@ -67,6 +101,50 @@ class MenuForm extends EntityForm {
         ]));
     }
     $form_state->setRedirectUrl($colossal_menu->urlInfo('collection'));
+  }
+
+  /**
+   * Form constructor to edit an entire menu tree at once.
+   *
+   * Shows for one menu the menu links accessible to the current user and
+   * relevant operations.
+   *
+   * This form constructor can be integrated as a section into another form. It
+   * relies on the following keys in $form_state:
+   * - menu: A menu entity.
+   * - menu_overview_form_parents: An array containing the parent keys to this
+   *   form.
+   * Forms integrating this section should call menu_overview_form_submit() from
+   * their form submit handler.
+   */
+  protected function buildOverviewForm(array &$form, FormStateInterface $form_state) {
+    $menu = $this->entity;
+
+    // Ensure that menu_overview_form_submit() knows the parents of this form
+    // section.
+    if (!$form_state->has('menu_overview_form_parents')) {
+      $form_state->set('menu_overview_form_parents', []);
+    }
+
+    $form['table'] = [
+      '#type' => 'table',
+      '#header' => [
+        $this->t('Label'),
+      ],
+    ];
+
+    $storage = $this->entityManager->getStorage('colossal_menu_link');
+    $ids = $storage->getQuery()
+        ->condition('menu', $menu->id())
+        ->execute();
+
+    foreach ($storage->loadMultiple($ids) as $id => $link) {
+      $form['table'][$id]['label'] = [
+        '#plain_text' => $link->label(),
+      ];
+    }
+
+    return $form;
   }
 
 }

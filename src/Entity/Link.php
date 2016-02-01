@@ -35,6 +35,9 @@ use Drupal\user\UserInterface;
  *       "edit" = "Drupal\colossal_menu\Form\LinkForm",
  *       "delete" = "Drupal\colossal_menu\Form\LinkDeleteForm",
  *     },
+ *     "route_provider" = {
+ *       "html" = "Drupal\Core\Entity\Routing\AdminHtmlRouteProvider",
+ *     },
  *     "access" = "Drupal\colossal_menu\LinkAccessControlHandler",
  *   },
  *   base_table = "colossal_menu_link",

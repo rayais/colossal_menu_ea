@@ -24,7 +24,7 @@ use Drupal\colossal_menu\LinkTypeInterface;
  *       "delete" = "Drupal\colossal_menu\Form\LinkTypeDeleteForm"
  *     },
  *     "route_provider" = {
- *       "html" = "Drupal\colossal_menu\LinkTypeHtmlRouteProvider",
+ *       "html" = "Drupal\Core\Entity\Routing\AdminHtmlRouteProvider",
  *     },
  *   },
  *   config_prefix = "link_type",

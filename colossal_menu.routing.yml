@@ -1,3 +1,4 @@
+# Link
 entity.colossal_menu_link.add_form:
   path: '/admin/structure/colossal_menu/{colossal_menu}/link/add/{colossal_menu_link_type}'
   defaults:
@@ -27,3 +28,27 @@ colossal_menu_link.settings:
     _admin_route: TRUE
   requirements:
     _permission: 'administer link entities'
+
+# Link type
+entity.colossal_menu_link_type.collection:
+  path: '/admin/structure/colossal_menu/link_type'
+  defaults:
+    _entity_list: 'colossal_menu_link_type'
+    _title: 'Link type'
+  options:
+    _admin_route: true
+  requirements:
+    _permission: administer site configuration
+
+entity.colossal_menu_link_type.add_form:
+  path: '/admin/structure/colossal_menu/link_type/add'
+  defaults:
+    _entity_form: 'colossal_menu_link_type.add'
+    _title: 'Add Link type'
+  options:
+    parameters:
+      colossal_menu_link_type:
+        type: 'entity:colossal_menu_link_type'
+    _admin_route: TRUE
+  requirements:
+    _entity_create_access: colossal_menu_link_type

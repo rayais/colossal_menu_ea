@@ -1,0 +1,29 @@
+entity.colossal_menu_link.add_form:
+  path: '/admin/structure/colossal_menu/{colossal_menu}/link/add/{colossal_menu_link_type}'
+  defaults:
+    _controller: '\Drupal\colossal_menu\Controller\LinkAddController::addForm'
+    _title_callback: '\Drupal\colossal_menu\Controller\LinkAddController::getAddFormTitle'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _entity_create_access: 'colossal_menu_link:{colossal_menu_link_type}'
+
+colossal_menu_link.add_page:
+  path: '/admin/structure/colossal_menu/{colossal_menu}/link/add'
+  defaults:
+    _controller: '\Drupal\colossal_menu\Controller\LinkAddController::add'
+    _title: 'Add Link'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _entity_create_access: 'colossal_menu_link'
+
+colossal_menu_link.settings:
+  path: '/admin/structure/{colossal_menu_link}/settings'
+  defaults:
+    _form: '\Drupal\colossal_menu\Controller\LinkSettingsForm'
+    _title: 'Link settings'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _permission: 'administer link entities'

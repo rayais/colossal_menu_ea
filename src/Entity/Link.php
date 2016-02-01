@@ -36,9 +36,6 @@ use Drupal\user\UserInterface;
  *       "delete" = "Drupal\colossal_menu\Form\LinkDeleteForm",
  *     },
  *     "access" = "Drupal\colossal_menu\LinkAccessControlHandler",
- *     "route_provider" = {
- *       "html" = "Drupal\colossal_menu\LinkHtmlRouteProvider",
- *     },
  *   },
  *   base_table = "colossal_menu_link",
  *   admin_permission = "administer link entities",

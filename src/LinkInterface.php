@@ -9,16 +9,13 @@ namespace Drupal\colossal_menu;
 
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityChangedInterface;
-use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\user\EntityOwnerInterface;
 
 /**
  * Provides an interface for defining Link entities.
  *
  * @ingroup colossal_menu
  */
-interface LinkInterface extends ContentEntityInterface, EntityChangedInterface, EntityOwnerInterface {
-  // Add get/set methods for your configuration properties here.
+interface LinkInterface extends ContentEntityInterface, EntityChangedInterface {
 
   /**
    * Gets the Link type.
@@ -37,29 +34,29 @@ interface LinkInterface extends ContentEntityInterface, EntityChangedInterface, 
   public function getMenu();
 
   /**
-   * Gets the Link name.
+   * Gets the Link title.
    *
    * @return string
-   *   Name of the Link.
+   *   Title of the Link.
    */
-  public function getName();
+  public function getTitle();
 
   /**
-   * Sets the Link name.
+   * Sets the Link title.
    *
    * @param string $name
-   *   The Link name.
+   *   The Link title.
    *
    * @return \Drupal\colossal_menu\LinkInterface
    *   The called Link entity.
    */
-  public function setName($name);
+  public function setTitle($name);
 
   /**
-   * Gets the Link creation timestamp.
+   * Gets the Link creation datetime.
    *
-   * @return int
-   *   Creation timestamp of the Link.
+   * @return \DateTime
+   *   Creation dateimte of the Link.
    */
   public function getCreatedTime();
 
@@ -82,17 +79,17 @@ interface LinkInterface extends ContentEntityInterface, EntityChangedInterface, 
    * @return bool
    *   TRUE if the Link is published.
    */
-  public function isPublished();
+  public function isEnabled();
 
   /**
    * Sets the published status of a Link.
    *
-   * @param bool $published
-   *   TRUE to set this Link to published, FALSE to set it to unpublished.
+   * @param bool $enabled
+   *   TRUE to set this Link to enabled, FALSE to set it to disabled.
    *
    * @return \Drupal\colossal_menu\LinkInterface
    *   The called Link entity.
    */
-  public function setPublished($published);
+  public function setEnabled($enabled);
 
 }

@@ -13,6 +13,7 @@ use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\colossal_menu\LinkInterface;
+use Drupal\link\LinkItemInterface;
 use Drupal\user\UserInterface;
 
 /**
@@ -89,6 +90,21 @@ class Link extends ContentEntityBase implements LinkInterface {
   /**
    * {@inheritdoc}
    */
+  public function getTitle() {
+    return $this->get('title')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setTitle($title) {
+    $this->set('title', $title);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getName() {
     return $this->get('name')->value;
   }
@@ -119,45 +135,30 @@ class Link extends ContentEntityBase implements LinkInterface {
   /**
    * {@inheritdoc}
    */
-  public function getOwner() {
-    return $this->get('user_id')->entity;
+  public function getChangedTime() {
+    return $this->get('created')->value;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getOwnerId() {
-    return $this->get('user_id')->target_id;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setOwnerId($uid) {
-    $this->set('user_id', $uid);
+  public function setChangedTime($timestamp) {
+    $this->set('created', $timestamp);
     return $this;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setOwner(UserInterface $account) {
-    $this->set('user_id', $account->id());
-    return $this;
+  public function isEnabled() {
+    return (bool) $this->getEntityKey('enabled');
   }
 
   /**
    * {@inheritdoc}
    */
-  public function isPublished() {
-    return (bool) $this->getEntityKey('status');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setPublished($published) {
-    $this->set('status', $published ? NODE_PUBLISHED : NODE_NOT_PUBLISHED);
+  public function setEnabled($enabled) {
+    $this->set('status', $enabled ? 1 : 0);
     return $this;
   }
 
@@ -182,11 +183,13 @@ class Link extends ContentEntityBase implements LinkInterface {
       ->setLabel(t('ID'))
       ->setDescription(t('The ID of the Link entity.'))
       ->setReadOnly(TRUE);
+
     $fields['type'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Type'))
       ->setDescription(t('The Link type/bundle.'))
       ->setSetting('target_type', 'colossal_menu_link_type')
       ->setRequired(TRUE);
+
     $fields['uuid'] = BaseFieldDefinition::create('uuid')
       ->setLabel(t('UUID'))
       ->setDescription(t('The UUID of the Link entity.'))
@@ -195,24 +198,15 @@ class Link extends ContentEntityBase implements LinkInterface {
     $fields['menu'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Menu'))
       ->setDescription(t('The menu of the Link entity.'))
-      ->setRevisionable(TRUE)
       ->setSetting('target_type', 'colossal_menu')
       ->setRequired(TRUE)
       ->setReadOnly(TRUE);
 
-    $fields['user_id'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('Authored by'))
-      ->setDescription(t('The user ID of author of the Link entity.'))
-      ->setRevisionable(TRUE)
-      ->setSetting('target_type', 'user')
+    $fields['parent'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Parent'))
+      ->setDescription(t('The parent item'))
+      ->setSetting('target_type', 'colossal_menu_link')
       ->setSetting('handler', 'default')
-      ->setDefaultValueCallback('Drupal\node\Entity\Node::getCurrentUserId')
-      ->setTranslatable(TRUE)
-      ->setDisplayOptions('view', array(
-        'label' => 'hidden',
-        'type' => 'author',
-        'weight' => 0,
-      ))
       ->setDisplayOptions('form', array(
         'type' => 'entity_reference_autocomplete',
         'weight' => 5,
@@ -223,33 +217,84 @@ class Link extends ContentEntityBase implements LinkInterface {
           'placeholder' => '',
         ),
       ))
-      ->setDisplayConfigurable('form', TRUE)
-      ->setDisplayConfigurable('view', TRUE);
+      ->setDisplayConfigurable('form', TRUE);
 
-    $fields['name'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Name'))
-      ->setDescription(t('The name of the Link entity.'))
-      ->setSettings(array(
-        'max_length' => 50,
-        'text_processing' => 0,
-      ))
-      ->setDefaultValue('')
+    $fields['title'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('Menu link title'))
+      ->setDescription(t('The text to be used for this link in the menu.'))
+      ->setRequired(TRUE)
+      ->setTranslatable(TRUE)
+      ->setSetting('max_length', 255)
       ->setDisplayOptions('view', array(
-        'label' => 'above',
+        'label' => 'hidden',
         'type' => 'string',
-        'weight' => -4,
+        'weight' => -5,
       ))
       ->setDisplayOptions('form', array(
         'type' => 'string_textfield',
+        'weight' => -5,
+      ))
+      ->setDisplayConfigurable('form', TRUE);
+
+    $fields['name'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('Link machine name'))
+      ->setDescription(t('The unique machine name for this menu item.'))
+      ->setRequired(TRUE)
+      ->setSetting('max_length', 255)
+      ->setPropertyConstraints('value', [
+        [
+          'UniqueField' => [],
+        ],
+      ]);
+
+    $fields['show_title'] = BaseFieldDefinition::create('boolean')
+      ->setLabel(t('Show Title'))
+      ->setDescription(t('A flag for whether the title should be shown or not.'))
+      ->setDefaultValue(TRUE)
+      ->setDisplayOptions('view', array(
+        'label' => 'hidden',
+        'type' => 'boolean',
         'weight' => -4,
       ))
-      ->setDisplayConfigurable('form', TRUE)
-      ->setDisplayConfigurable('view', TRUE);
+      ->setDisplayOptions('form', array(
+        'settings' => array('display_label' => TRUE),
+        'weight' => -4,
+      ));
 
-    $fields['status'] = BaseFieldDefinition::create('boolean')
-      ->setLabel(t('Publishing status'))
-      ->setDescription(t('A boolean indicating whether the Link is published.'))
-      ->setDefaultValue(TRUE);
+    $fields['link'] = BaseFieldDefinition::create('link')
+      ->setLabel(t('Link'))
+      ->setDescription(t('The location this menu link points to.'))
+      ->setSettings(array(
+        'link_type' => LinkItemInterface::LINK_GENERIC,
+        'title' => DRUPAL_DISABLED,
+      ))
+      ->setDisplayOptions('form', array(
+        'type' => 'link_default',
+        'weight' => -2,
+      ));
+
+    $fields['weight'] = BaseFieldDefinition::create('integer')
+      ->setLabel(t('Weight'))
+      ->setDescription(t('Link weight among links in the same menu at the same depth. In the menu, the links with high weight will sink and links with a low weight will be positioned nearer the top.'))
+      ->setDefaultValue(0);
+
+    $fields['enabled'] = BaseFieldDefinition::create('boolean')
+      ->setLabel(t('Enabled'))
+      ->setDescription(t('A flag for whether the link should be enabled in menus or hidden.'))
+      ->setDefaultValue(TRUE)
+      ->setDisplayOptions('view', array(
+        'label' => 'hidden',
+        'type' => 'boolean',
+        'weight' => 0,
+      ))
+      ->setDisplayOptions('form', array(
+        'settings' => array('display_label' => TRUE),
+        'weight' => -1,
+      ));
+
+    $fields['parent'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('Parent plugin ID'))
+      ->setDescription(t('The ID of the parent menu link plugin, or empty string when at the top level of the hierarchy.'));
 
     $fields['langcode'] = BaseFieldDefinition::create('language')
       ->setLabel(t('Language code'))

@@ -7,14 +7,12 @@
 
 namespace Drupal\colossal_menu\Entity;
 
-use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\colossal_menu\LinkInterface;
 use Drupal\link\LinkItemInterface;
-use Drupal\user\UserInterface;
 
 /**
  * Defines the Link entity.
@@ -29,7 +27,6 @@ use Drupal\user\UserInterface;
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "list_builder" = "Drupal\colossal_menu\LinkListBuilder",
  *     "views_data" = "Drupal\colossal_menu\Entity\LinkViewsData",
- *
  *     "form" = {
  *       "default" = "Drupal\colossal_menu\Form\LinkForm",
  *       "add" = "Drupal\colossal_menu\Form\LinkForm",
@@ -46,9 +43,8 @@ use Drupal\user\UserInterface;
  *   entity_keys = {
  *     "id" = "id",
  *     "bundle" = "type",
- *     "label" = "name",
+ *     "label" = "link",
  *     "uuid" = "uuid",
- *     "uid" = "user_id",
  *     "langcode" = "langcode",
  *   },
  *   links = {
@@ -63,14 +59,12 @@ use Drupal\user\UserInterface;
  */
 class Link extends ContentEntityBase implements LinkInterface {
   use EntityChangedTrait;
+
   /**
    * {@inheritdoc}
    */
-  public static function preCreate(EntityStorageInterface $storage_controller, array &$values) {
-    parent::preCreate($storage_controller, $values);
-    $values += array(
-      'user_id' => \Drupal::currentUser()->id(),
-    );
+  public function label() {
+    return $this->getTitle();
   }
 
   /**
@@ -91,7 +85,7 @@ class Link extends ContentEntityBase implements LinkInterface {
    * {@inheritdoc}
    */
   public function getTitle() {
-    return $this->get('title')->value;
+    return $this->get('link')->title;
   }
 
   /**
@@ -114,6 +108,36 @@ class Link extends ContentEntityBase implements LinkInterface {
    */
   public function setName($name) {
     $this->set('name', $name);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getWeight() {
+    return $this->get('weight')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setWeight($weight) {
+    $this->set('weight', $weight);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getParent() {
+    return $this->get('parent')->entity;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setParent($parent) {
+    $this->set('parent', $parent);
     return $this;
   }
 
@@ -207,35 +231,19 @@ class Link extends ContentEntityBase implements LinkInterface {
       ->setDescription(t('The parent item'))
       ->setSetting('target_type', 'colossal_menu_link')
       ->setSetting('handler', 'default')
-      ->setDisplayOptions('form', array(
+      ->setDisplayOptions('form', [
         'type' => 'entity_reference_autocomplete',
         'weight' => 5,
-        'settings' => array(
+        'settings' => [
           'match_operator' => 'CONTAINS',
           'size' => '60',
           'autocomplete_type' => 'tags',
           'placeholder' => '',
-        ),
-      ))
+        ],
+      ])
       ->setDisplayConfigurable('form', TRUE);
 
-    $fields['title'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Menu link title'))
-      ->setDescription(t('The text to be used for this link in the menu.'))
-      ->setRequired(TRUE)
-      ->setTranslatable(TRUE)
-      ->setSetting('max_length', 255)
-      ->setDisplayOptions('view', array(
-        'label' => 'hidden',
-        'type' => 'string',
-        'weight' => -5,
-      ))
-      ->setDisplayOptions('form', array(
-        'type' => 'string_textfield',
-        'weight' => -5,
-      ))
-      ->setDisplayConfigurable('form', TRUE);
-
+    /*
     $fields['name'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Link machine name'))
       ->setDescription(t('The unique machine name for this menu item.'))
@@ -246,7 +254,24 @@ class Link extends ContentEntityBase implements LinkInterface {
           'UniqueField' => [],
         ],
       ]);
+      */
 
+    $fields['link'] = BaseFieldDefinition::create('link')
+      ->setLabel(t('Link'))
+      ->setRequired(TRUE)
+      ->setSettings(array(
+        'link_type' => LinkItemInterface::LINK_GENERIC,
+        'title' => DRUPAL_REQUIRED,
+      ))
+      ->setDisplayOptions('form', array(
+        'type' => 'link_default',
+        'weight' => -2,
+      ))
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('display', TRUE);
+
+
+    /*
     $fields['show_title'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('Show Title'))
       ->setDescription(t('A flag for whether the title should be shown or not.'))
@@ -260,24 +285,14 @@ class Link extends ContentEntityBase implements LinkInterface {
         'settings' => array('display_label' => TRUE),
         'weight' => -4,
       ));
-
-    $fields['link'] = BaseFieldDefinition::create('link')
-      ->setLabel(t('Link'))
-      ->setDescription(t('The location this menu link points to.'))
-      ->setSettings(array(
-        'link_type' => LinkItemInterface::LINK_GENERIC,
-        'title' => DRUPAL_DISABLED,
-      ))
-      ->setDisplayOptions('form', array(
-        'type' => 'link_default',
-        'weight' => -2,
-      ));
+     */
 
     $fields['weight'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Weight'))
       ->setDescription(t('Link weight among links in the same menu at the same depth. In the menu, the links with high weight will sink and links with a low weight will be positioned nearer the top.'))
       ->setDefaultValue(0);
 
+    /*
     $fields['enabled'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('Enabled'))
       ->setDescription(t('A flag for whether the link should be enabled in menus or hidden.'))
@@ -291,6 +306,7 @@ class Link extends ContentEntityBase implements LinkInterface {
         'settings' => array('display_label' => TRUE),
         'weight' => -1,
       ));
+    */
 
     $fields['parent'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Parent plugin ID'))

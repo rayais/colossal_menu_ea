@@ -7,6 +7,7 @@
 
 namespace Drupal\colossal_menu\Form;
 
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -67,13 +68,13 @@ class MenuForm extends EntityForm {
     );
 
     // Add menu links administration form for existing menus.
-    if (!$menu->isNew() || $menu->isLocked()) {
+    if (!$menu->isNew()) {
       // Form API supports constructing and validating self-contained sections
       // within forms, but does not allow handling the form section's submission
       // equally separated yet. Therefore, we use a $form_state key to point to
       // the parents of the form section.
       // @see self::submitOverviewForm()
-      $form_state->set('menu_overview_form_parents', ['links']);
+      $form_state->set('links', ['links']);
       $form['links'] = array();
       $form['links'] = $this->buildOverviewForm($form['links'], $form_state);
     }
@@ -85,22 +86,46 @@ class MenuForm extends EntityForm {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
-    $colossal_menu = $this->entity;
-    $status = $colossal_menu->save();
+    $menu = $this->entity;
+
+    if (!$menu->isNew()) {
+      $this->submitOverviewForm($form, $form_state);
+    }
+
+    $status = $menu->save();
 
     switch ($status) {
       case SAVED_NEW:
         drupal_set_message($this->t('Created the %label Menu.', [
-          '%label' => $colossal_menu->label(),
+          '%label' => $menu->label(),
         ]));
         break;
 
       default:
         drupal_set_message($this->t('Saved the %label Menu.', [
-          '%label' => $colossal_menu->label(),
+          '%label' => $menu->label(),
         ]));
     }
-    $form_state->setRedirectUrl($colossal_menu->urlInfo('collection'));
+    $form_state->setRedirectUrl($menu->urlInfo('collection'));
+  }
+
+  /**
+   * Submit handler for the menu overview form.
+   *
+   * This function takes great care in saving parent items first, then items
+   * underneath them. Saving items in the incorrect order can break the tree.
+   */
+  protected function submitOverviewForm(array $complete_form, FormStateInterface $form_state) {
+    $input = $form_state->getUserInput();
+
+    foreach ($input['links'] as $id => $input) {
+      $storage = $this->entityManager->getStorage('colossal_menu_link');
+      $link = $storage->load($id);
+
+      $link->setParent($input['parent']);
+      $link->setWeight($input['weight']);
+      $link->save();
+    }
   }
 
   /**
@@ -126,10 +151,31 @@ class MenuForm extends EntityForm {
       $form_state->set('menu_overview_form_parents', []);
     }
 
-    $form['table'] = [
+    $form['links'] = [
       '#type' => 'table',
+      '#tree' => TRUE,
       '#header' => [
-        $this->t('Label'),
+        $this->t('Title'),
+        $this->t('Weight'),
+        [
+          'data' => $this->t('Operations'),
+          'colspan' => 3,
+        ],
+      ],
+      '#tabledrag' => [
+        [
+          'action' => 'match',
+          'relationship' => 'parent',
+          'group' => 'link-parent',
+          'subgroup' => 'link-parent',
+          'source' => 'link-id',
+          'hidden' => TRUE,
+        ],
+        [
+          'action' => 'order',
+          'relationship' => 'sibling',
+          'group' => 'link-weight',
+        ],
       ],
     ];
 
@@ -139,9 +185,52 @@ class MenuForm extends EntityForm {
         ->execute();
 
     foreach ($storage->loadMultiple($ids) as $id => $link) {
-      $form['table'][$id]['label'] = [
+      $form['links'][$id] = [
+        '#weight' => $link->getWeight(),
+        '#attributes' => [
+          'class' => [
+            'draggable',
+          ],
+        ],
+      ];
+
+      $form['links'][$id]['label'] = [
         '#plain_text' => $link->label(),
       ];
+
+      $form['links'][$id]['weight'] = [
+        '#type' => 'weight',
+        '#delta' => count($ids),
+        '#default_value' => $link->getWeight(),
+        '#title' => $this->t('Weight for @title', array('@title' => $link->getTitle())),
+        '#title_display' => 'invisible',
+        '#attributes' => [
+          'class' => [
+            'link-weight',
+          ],
+        ],
+      ];
+
+      $form['links'][$id]['id'] = [
+        '#type' => 'hidden',
+        '#value' => $id,
+        '#attributes' => [
+          'class' => [
+            'link-id',
+          ],
+        ],
+      ];
+
+      $form['links'][$id]['parent'] = array(
+        '#type' => 'hidden',
+        '#default_value' => ($link->getParent()) ? $link->getParent()->id() : 0,
+        '#attributes' => [
+          'class' => [
+            'link-parent',
+          ],
+        ],
+      );
+
     }
 
     return $form;

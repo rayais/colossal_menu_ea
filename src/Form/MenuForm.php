@@ -194,8 +194,14 @@ class MenuForm extends EntityForm {
         ],
       ];
 
-      $form['links'][$id]['label'] = [
-        '#plain_text' => $link->label(),
+      $form['links'][$id]['indent'] = [
+        [
+          '#theme' => 'indentation',
+          '#size' => 0,
+        ],
+        [
+          '#plain_text' => $link->label(),
+        ],
       ];
 
       $form['links'][$id]['weight'] = [

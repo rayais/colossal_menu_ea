@@ -62,6 +62,228 @@ class Link extends ContentEntityBase implements LinkInterface {
 
   /**
    * {@inheritdoc}
+   *
+   * Update the link tree.
+   */
+  public function save() {
+    $response = parent::save();
+    $connection = \Database::getConnection();
+
+    if ($response == SAVED_NEW) {
+      // Add the Link to itself.
+      $connection->insert('colossal_menu_link_tree', 't')
+        ->fields('t', [
+          'ancestor' => $this->id(),
+          'descendant' => $this->id(),
+          'depth' => 0,
+        ])
+        ->execute();
+
+      if ($this->get('parent')) {
+        // Get the tree of the link's parent.
+        $result = $connection->select('colossal_menu_link_tree', 't')
+          ->fields('t', ['ancestor', 'depth'])
+          ->condition('t.descendant', $this->getParent()->id())
+          ->execute();
+
+        while ($row = $result->fetchObject()) {
+          $connection->insert('colossal_menu_link_tree', 't')
+            ->fields('t', [
+              'ancestor' => $row->ancestor,
+              'descendant' => $this->id(),
+              'depth' => $row->depth + 1,
+            ])
+            ->execute();
+        }
+      }
+    }
+    elseif ($response == SAVED_UPDATED) {
+
+      if (!$this->get('parent') || !$this->original->get('parent') || $this->original->getParent()->id() != $this->getParent()->id()) {
+
+        // First get the link's tree below itself.
+        $query = $connection->select('colossal_menu_link_tree', 't')
+          ->fields('t', ['descendant', 'depth'])
+          ->condition('c.ancestor', $this->id());
+        $result = $query->execute();
+
+        $descendants = [];
+        $ids = [];
+        while ($row = $result->fetchObject()) {
+          $descendants[] = [
+            'descendant' => $row->descendant,
+            'depth' => $row->depth,
+          ];
+          $ids[] = $row->descendant;
+        }
+
+        // Then delete the comment tree above the current comment.
+        $connection->delete('colossal_menu_link_tree')
+          ->condition('descendant', $ids)
+          ->condition('ancestor', $ids, 'NOT IN')
+          ->execute();
+
+        if ($this->get('parent')) {
+          // Finally, copy the tree from the new parent.
+          $result = $connection->select('colossal_menu_link_tree', 't')
+            ->fields('t', ['ancestor', 'depth'])
+            ->condition('c.descendant', $this->getParent()->id)
+            ->execute();
+
+          while ($row = $result->fetchObject()) {
+            foreach ($descendants as $descendant) {
+              $connection->insert('colossal_menu_link_tree', 't')
+                ->fields('t', [
+                  'ancestor' => $row->ancestor,
+                  'descendant' => $descendant['descendant'],
+                  'depth' => $row->depth + $descendant['depth'] + 1,
+                ])
+                ->execute();
+            }
+          }
+        }
+
+      }
+    }
+
+    return $response;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
+    $fields['id'] = BaseFieldDefinition::create('integer')
+      ->setLabel(t('ID'))
+      ->setDescription(t('The ID of the Link entity.'))
+      ->setReadOnly(TRUE);
+
+    $fields['type'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Type'))
+      ->setDescription(t('The Link type/bundle.'))
+      ->setSetting('target_type', 'colossal_menu_link_type')
+      ->setRequired(TRUE);
+
+    $fields['uuid'] = BaseFieldDefinition::create('uuid')
+      ->setLabel(t('UUID'))
+      ->setDescription(t('The UUID of the Link entity.'))
+      ->setReadOnly(TRUE);
+
+    $fields['menu'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Menu'))
+      ->setDescription(t('The menu of the Link entity.'))
+      ->setSetting('target_type', 'colossal_menu')
+      ->setRequired(TRUE)
+      ->setReadOnly(TRUE);
+
+    $fields['parent'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Parent'))
+      ->setDescription(t('The parent item'))
+      ->setSetting('target_type', 'colossal_menu_link')
+      ->setSetting('handler', 'default')
+      ->setDisplayOptions('form', [
+        'type' => 'entity_reference_autocomplete',
+        'weight' => 5,
+        'settings' => [
+          'match_operator' => 'CONTAINS',
+          'size' => '60',
+          'autocomplete_type' => 'tags',
+          'placeholder' => '',
+        ],
+      ])
+      ->setDisplayConfigurable('form', TRUE);
+
+    /*
+    $fields['name'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('Link machine name'))
+      ->setDescription(t('The unique machine name for this menu item.'))
+      ->setRequired(TRUE)
+      ->setSetting('max_length', 255)
+      ->setPropertyConstraints('value', [
+        [
+          'UniqueField' => [],
+        ],
+      ]);
+      */
+
+    $fields['link'] = BaseFieldDefinition::create('link')
+      ->setLabel(t('Link'))
+      ->setRequired(TRUE)
+      ->setSettings(array(
+        'link_type' => LinkItemInterface::LINK_GENERIC,
+        'title' => DRUPAL_REQUIRED,
+      ))
+      ->setDisplayOptions('form', array(
+        'type' => 'link_default',
+        'weight' => -2,
+      ))
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('display', TRUE);
+
+
+    /*
+    $fields['show_title'] = BaseFieldDefinition::create('boolean')
+      ->setLabel(t('Show Title'))
+      ->setDescription(t('A flag for whether the title should be shown or not.'))
+      ->setDefaultValue(TRUE)
+      ->setDisplayOptions('view', array(
+        'label' => 'hidden',
+        'type' => 'boolean',
+        'weight' => -4,
+      ))
+      ->setDisplayOptions('form', array(
+        'settings' => array('display_label' => TRUE),
+        'weight' => -4,
+      ));
+     */
+
+    $fields['weight'] = BaseFieldDefinition::create('integer')
+      ->setLabel(t('Weight'))
+      ->setDescription(t('Link weight among links in the same menu at the same depth. In the menu, the links with high weight will sink and links with a low weight will be positioned nearer the top.'))
+      ->setDefaultValue(0);
+
+    /*
+    $fields['enabled'] = BaseFieldDefinition::create('boolean')
+      ->setLabel(t('Enabled'))
+      ->setDescription(t('A flag for whether the link should be enabled in menus or hidden.'))
+      ->setDefaultValue(TRUE)
+      ->setDisplayOptions('view', array(
+        'label' => 'hidden',
+        'type' => 'boolean',
+        'weight' => 0,
+      ))
+      ->setDisplayOptions('form', array(
+        'settings' => array('display_label' => TRUE),
+        'weight' => -1,
+      ));
+    */
+
+    $fields['parent'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('Parent plugin ID'))
+      ->setDescription(t('The ID of the parent menu link plugin, or empty string when at the top level of the hierarchy.'));
+
+    $fields['langcode'] = BaseFieldDefinition::create('language')
+      ->setLabel(t('Language code'))
+      ->setDescription(t('The language code for the Link entity.'))
+      ->setDisplayOptions('form', array(
+        'type' => 'language_select',
+        'weight' => 10,
+      ))
+      ->setDisplayConfigurable('form', TRUE);
+
+    $fields['created'] = BaseFieldDefinition::create('created')
+      ->setLabel(t('Created'))
+      ->setDescription(t('The time that the entity was created.'));
+
+    $fields['changed'] = BaseFieldDefinition::create('changed')
+      ->setLabel(t('Changed'))
+      ->setDescription(t('The time that the entity was last edited.'));
+
+    return $fields;
+  }
+
+  /**
+   * {@inheritdoc}
    */
   public function label() {
     return $this->getTitle();
@@ -233,139 +455,6 @@ class Link extends ContentEntityBase implements LinkInterface {
     }
 
     return $params;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
-    $fields['id'] = BaseFieldDefinition::create('integer')
-      ->setLabel(t('ID'))
-      ->setDescription(t('The ID of the Link entity.'))
-      ->setReadOnly(TRUE);
-
-    $fields['type'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('Type'))
-      ->setDescription(t('The Link type/bundle.'))
-      ->setSetting('target_type', 'colossal_menu_link_type')
-      ->setRequired(TRUE);
-
-    $fields['uuid'] = BaseFieldDefinition::create('uuid')
-      ->setLabel(t('UUID'))
-      ->setDescription(t('The UUID of the Link entity.'))
-      ->setReadOnly(TRUE);
-
-    $fields['menu'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('Menu'))
-      ->setDescription(t('The menu of the Link entity.'))
-      ->setSetting('target_type', 'colossal_menu')
-      ->setRequired(TRUE)
-      ->setReadOnly(TRUE);
-
-    $fields['parent'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('Parent'))
-      ->setDescription(t('The parent item'))
-      ->setSetting('target_type', 'colossal_menu_link')
-      ->setSetting('handler', 'default')
-      ->setDisplayOptions('form', [
-        'type' => 'entity_reference_autocomplete',
-        'weight' => 5,
-        'settings' => [
-          'match_operator' => 'CONTAINS',
-          'size' => '60',
-          'autocomplete_type' => 'tags',
-          'placeholder' => '',
-        ],
-      ])
-      ->setDisplayConfigurable('form', TRUE);
-
-    /*
-    $fields['name'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Link machine name'))
-      ->setDescription(t('The unique machine name for this menu item.'))
-      ->setRequired(TRUE)
-      ->setSetting('max_length', 255)
-      ->setPropertyConstraints('value', [
-        [
-          'UniqueField' => [],
-        ],
-      ]);
-      */
-
-    $fields['link'] = BaseFieldDefinition::create('link')
-      ->setLabel(t('Link'))
-      ->setRequired(TRUE)
-      ->setSettings(array(
-        'link_type' => LinkItemInterface::LINK_GENERIC,
-        'title' => DRUPAL_REQUIRED,
-      ))
-      ->setDisplayOptions('form', array(
-        'type' => 'link_default',
-        'weight' => -2,
-      ))
-      ->setDisplayConfigurable('form', TRUE)
-      ->setDisplayConfigurable('display', TRUE);
-
-
-    /*
-    $fields['show_title'] = BaseFieldDefinition::create('boolean')
-      ->setLabel(t('Show Title'))
-      ->setDescription(t('A flag for whether the title should be shown or not.'))
-      ->setDefaultValue(TRUE)
-      ->setDisplayOptions('view', array(
-        'label' => 'hidden',
-        'type' => 'boolean',
-        'weight' => -4,
-      ))
-      ->setDisplayOptions('form', array(
-        'settings' => array('display_label' => TRUE),
-        'weight' => -4,
-      ));
-     */
-
-    $fields['weight'] = BaseFieldDefinition::create('integer')
-      ->setLabel(t('Weight'))
-      ->setDescription(t('Link weight among links in the same menu at the same depth. In the menu, the links with high weight will sink and links with a low weight will be positioned nearer the top.'))
-      ->setDefaultValue(0);
-
-    /*
-    $fields['enabled'] = BaseFieldDefinition::create('boolean')
-      ->setLabel(t('Enabled'))
-      ->setDescription(t('A flag for whether the link should be enabled in menus or hidden.'))
-      ->setDefaultValue(TRUE)
-      ->setDisplayOptions('view', array(
-        'label' => 'hidden',
-        'type' => 'boolean',
-        'weight' => 0,
-      ))
-      ->setDisplayOptions('form', array(
-        'settings' => array('display_label' => TRUE),
-        'weight' => -1,
-      ));
-    */
-
-    $fields['parent'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Parent plugin ID'))
-      ->setDescription(t('The ID of the parent menu link plugin, or empty string when at the top level of the hierarchy.'));
-
-    $fields['langcode'] = BaseFieldDefinition::create('language')
-      ->setLabel(t('Language code'))
-      ->setDescription(t('The language code for the Link entity.'))
-      ->setDisplayOptions('form', array(
-        'type' => 'language_select',
-        'weight' => 10,
-      ))
-      ->setDisplayConfigurable('form', TRUE);
-
-    $fields['created'] = BaseFieldDefinition::create('created')
-      ->setLabel(t('Created'))
-      ->setDescription(t('The time that the entity was created.'));
-
-    $fields['changed'] = BaseFieldDefinition::create('changed')
-      ->setLabel(t('Changed'))
-      ->setDescription(t('The time that the entity was last edited.'));
-
-    return $fields;
   }
 
   /**

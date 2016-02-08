@@ -70,15 +70,8 @@ class Link extends ContentEntityBase implements LinkInterface {
   /**
    * {@inheritdoc}
    */
-  public function getType() {
-    return $this->bundle();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getMenu() {
-    return $this->get('menu')->entity;
+  public function getMenuName() {
+    return $this->get('menu')->entity->id();
   }
 
   /**
@@ -91,24 +84,8 @@ class Link extends ContentEntityBase implements LinkInterface {
   /**
    * {@inheritdoc}
    */
-  public function setTitle($title) {
-    $this->set('title', $title);
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getName() {
-    return $this->get('name')->value;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setName($name) {
-    $this->set('name', $name);
-    return $this;
+  public function getDescription() {
+    return $this->get('link')->title;
   }
 
   /**
@@ -118,13 +95,6 @@ class Link extends ContentEntityBase implements LinkInterface {
     return $this->get('weight')->value;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function setWeight($weight) {
-    $this->set('weight', $weight);
-    return $this;
-  }
 
   /**
    * {@inheritdoc}
@@ -136,54 +106,120 @@ class Link extends ContentEntityBase implements LinkInterface {
   /**
    * {@inheritdoc}
    */
-  public function setParent($parent) {
-    $this->set('parent', $parent);
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getCreatedTime() {
-    return $this->get('created')->value;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setCreatedTime($timestamp) {
-    $this->set('created', $timestamp);
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getChangedTime() {
-    return $this->get('created')->value;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setChangedTime($timestamp) {
-    $this->set('created', $timestamp);
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function isEnabled() {
-    return (bool) $this->getEntityKey('enabled');
+    return (bool) $this->get('enabled');
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setEnabled($enabled) {
-    $this->set('status', $enabled ? 1 : 0);
-    return $this;
+  public function isExpanded() {
+    return TRUE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isResettable() {
+    return FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isDeletable() {
+    return TRUE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getRouteName() {
+    if ($this->get('link')->isExternal()) {
+      return '';
+    }
+
+    return $this->get('link')->getUrl()->getRouteName();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getRouteParameters() {
+    if ($this->get('link')->isExternal()) {
+      return [];
+    }
+
+    return $this->get('link')->getUrl()->getRouteParameters();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getUrlObject($title_attribute = TRUE) {
+    return $this->get('link')->getUrl();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getOptions() {
+    return $this->get('link')->options;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getMetaData() {
+    return [];
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * Not sure what this would do in this context.
+   */
+  public function updateLink(array $new_definition_values, $persist) {
+    return [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function deleteLink() {
+    return $this->delete();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getFormClass() {
+    return $this->getEntityKey('handlers')['form']['default'];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getDeleteRoute() {
+    return Url::fromRoute($this->getEntityKey('handlers')['form']['delete'], [
+      'colossal_menu' => $this->getMenuName(),
+    ]);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getEditRoute() {
+    return Url::fromRoute($this->getEntityKey('handlers')['form']['edit'], [
+      'colossal_menu' => $this->getMenuName(),
+    ]);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getTranslateRoute() {
+    return $this->getEditRoute();
   }
 
   /**
@@ -193,7 +229,7 @@ class Link extends ContentEntityBase implements LinkInterface {
     $params = parent::urlRouteParameters($rel);
 
     if (in_array($rel, ['canonical', 'edit-form', 'delete-form'])) {
-      $params['colossal_menu'] = $this->getMenu()->id();
+      $params['colossal_menu'] = $this->getMenuName();
     }
 
     return $params;
@@ -330,6 +366,41 @@ class Link extends ContentEntityBase implements LinkInterface {
       ->setDescription(t('The time that the entity was last edited.'));
 
     return $fields;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getProvider() {
+    return 'colossal_menu';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getPluginId() {
+    return 'colossal_menu_link:' . $this->get('uuid');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getPluginDefinition() {
+    return [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getBaseId() {
+    return 'colossal_menu_link';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getDerivativeId() {
+    return $this->get('uuid');
   }
 
 }

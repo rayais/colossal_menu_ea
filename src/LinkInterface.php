@@ -16,4 +16,28 @@ use Drupal\Core\Menu\MenuLinkInterface;
  *
  * @ingroup colossal_menu
  */
-interface LinkInterface extends MenuLinkInterface, ContentEntityInterface, EntityChangedInterface {}
+interface LinkInterface extends MenuLinkInterface, ContentEntityInterface, EntityChangedInterface {
+
+  /**
+   * Sets the parent.
+   *
+   * @param int $parent
+   *   The id of the parent.
+   *
+   * @return \Drupal\colossal_menu\LinkInterface
+   *   Return this.
+   */
+  public function setParent($parent);
+
+  /**
+   * Sets the weight.
+   *
+   * @param int $weight
+   *   The weight.
+   *
+   * @return \Drupal\colossal_menu\LinkInterface
+   *   Return this.
+   */
+  public function setWeight($weight);
+
+}

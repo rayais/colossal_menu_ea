@@ -7,10 +7,12 @@
 
 namespace Drupal\colossal_menu\Entity;
 
-use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Database\Query\Condition;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\colossal_menu\LinkInterface;
 use Drupal\link\LinkItemInterface;
 
@@ -61,25 +63,31 @@ class Link extends ContentEntityBase implements LinkInterface {
   use EntityChangedTrait;
 
   /**
+   * Database Connection.
+   *
+   * @var \DatabaseConnection
+   */
+  protected $connection;
+
+  /**
    * {@inheritdoc}
    *
    * Update the link tree.
    */
-  public function save() {
-    $response = parent::save();
-    $connection = \Database::getConnection();
+  public function postSave(EntityStorageInterface $storage, $update = TRUE) {
+    $connection = $this->getConnection();
 
-    if ($response == SAVED_NEW) {
+    if (!$update) {
       // Add the Link to itself.
-      $connection->insert('colossal_menu_link_tree', 't')
-        ->fields('t', [
+      $connection->insert('colossal_menu_link_tree')
+        ->fields([
           'ancestor' => $this->id(),
           'descendant' => $this->id(),
           'depth' => 0,
         ])
         ->execute();
 
-      if ($this->get('parent')) {
+      if ($this->getParent()) {
         // Get the tree of the link's parent.
         $result = $connection->select('colossal_menu_link_tree', 't')
           ->fields('t', ['ancestor', 'depth'])
@@ -87,8 +95,8 @@ class Link extends ContentEntityBase implements LinkInterface {
           ->execute();
 
         while ($row = $result->fetchObject()) {
-          $connection->insert('colossal_menu_link_tree', 't')
-            ->fields('t', [
+          $connection->insert('colossal_menu_link_tree')
+            ->fields([
               'ancestor' => $row->ancestor,
               'descendant' => $this->id(),
               'depth' => $row->depth + 1,
@@ -97,56 +105,75 @@ class Link extends ContentEntityBase implements LinkInterface {
         }
       }
     }
-    elseif ($response == SAVED_UPDATED) {
+    else {
 
-      if (!$this->get('parent') || !$this->original->get('parent') || $this->original->getParent()->id() != $this->getParent()->id()) {
+      // First get the link's tree below itself.
+      $query = $connection->select('colossal_menu_link_tree', 't')
+        ->fields('t', ['descendant', 'depth'])
+        ->condition('t.ancestor', $this->id());
+      $result = $query->execute();
 
-        // First get the link's tree below itself.
-        $query = $connection->select('colossal_menu_link_tree', 't')
-          ->fields('t', ['descendant', 'depth'])
-          ->condition('c.ancestor', $this->id());
-        $result = $query->execute();
+      $descendants = [];
+      $ids = [];
+      while ($row = $result->fetchObject()) {
+        $descendants[] = [
+          'descendant' => $row->descendant,
+          'depth' => $row->depth,
+        ];
+        $ids[] = $row->descendant;
+      }
 
-        $descendants = [];
-        $ids = [];
-        while ($row = $result->fetchObject()) {
-          $descendants[] = [
-            'descendant' => $row->descendant,
-            'depth' => $row->depth,
-          ];
-          $ids[] = $row->descendant;
-        }
-
-        // Then delete the comment tree above the current comment.
+      // Then delete the comment tree above the current comment.
+      if (!empty($ids)) {
         $connection->delete('colossal_menu_link_tree')
           ->condition('descendant', $ids)
           ->condition('ancestor', $ids, 'NOT IN')
           ->execute();
+      }
 
-        if ($this->get('parent')) {
-          // Finally, copy the tree from the new parent.
-          $result = $connection->select('colossal_menu_link_tree', 't')
-            ->fields('t', ['ancestor', 'depth'])
-            ->condition('c.descendant', $this->getParent()->id)
-            ->execute();
+      if ($this->getParent()) {
+        // Finally, copy the tree from the new parent.
+        $result = $connection->select('colossal_menu_link_tree', 't')
+          ->fields('t', ['ancestor', 'depth'])
+          ->condition('c.descendant', $this->getParent()->id())
+          ->execute();
 
-          while ($row = $result->fetchObject()) {
-            foreach ($descendants as $descendant) {
-              $connection->insert('colossal_menu_link_tree', 't')
-                ->fields('t', [
-                  'ancestor' => $row->ancestor,
-                  'descendant' => $descendant['descendant'],
-                  'depth' => $row->depth + $descendant['depth'] + 1,
-                ])
-                ->execute();
-            }
+        while ($row = $result->fetchObject()) {
+          foreach ($descendants as $descendant) {
+            $connection->insert('colossal_menu_link_tree')
+              ->fields([
+                'ancestor' => $row->ancestor,
+                'descendant' => $descendant['descendant'],
+                'depth' => $row->depth + $descendant['depth'] + 1,
+              ])
+              ->execute();
           }
         }
 
       }
     }
 
-    return $response;
+    return parent::postSave($storage, $update);
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * Update the link tree.
+   */
+  public static function postDelete(EntityStorageInterface $storage, array $entities) {
+    $connection = \Drupal::service('database');
+
+    foreach ($entities as $entity) {
+      $query = $connection->delete('colossal_menu_link_tree');
+      $or = new Condition('OR');
+      $or->condition('ancestor', $entity->id());
+      $or->condition('descendant', $entity->id());
+      $query->condition($or);
+      $query->execute();
+    }
+
+    return parent::postDelete($storage, $entities);
   }
 
   /**
@@ -258,10 +285,6 @@ class Link extends ContentEntityBase implements LinkInterface {
       ));
     */
 
-    $fields['parent'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Parent plugin ID'))
-      ->setDescription(t('The ID of the parent menu link plugin, or empty string when at the top level of the hierarchy.'));
-
     $fields['langcode'] = BaseFieldDefinition::create('language')
       ->setLabel(t('Language code'))
       ->setDescription(t('The language code for the Link entity.'))
@@ -317,12 +340,26 @@ class Link extends ContentEntityBase implements LinkInterface {
     return $this->get('weight')->value;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function setWeight($weight) {
+    return $this->set('weight', $weight);
+  }
+
 
   /**
    * {@inheritdoc}
    */
   public function getParent() {
     return $this->get('parent')->entity;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setParent($parent) {
+    return $this->set('parent', $parent);
   }
 
   /**
@@ -490,6 +527,32 @@ class Link extends ContentEntityBase implements LinkInterface {
    */
   public function getDerivativeId() {
     return $this->get('uuid');
+  }
+
+  /**
+   * Get the database connection.
+   *
+   * @return \Drupal\Core\Database\Connection
+   *   The database connection.
+   */
+  protected function getConnection() {
+    if (!$this->connection) {
+      $this->connection = $this->container()->get('database');
+    }
+    return $this->connection;
+  }
+
+  /**
+   * Returns the service container.
+   *
+   * This method is marked private to prevent sub-classes from retrieving
+   * services from the container through it.
+   *
+   * @return \Symfony\Component\DependencyInjection\ContainerInterface $container
+   *   The service container.
+   */
+  private function container() {
+    return \Drupal::getContainer();
   }
 
 }

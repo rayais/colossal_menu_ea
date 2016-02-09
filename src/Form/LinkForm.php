@@ -88,7 +88,7 @@ class LinkForm extends ContentEntityForm implements MenuLinkFormInterface {
     }
 
     $form_state->setRedirect('entity.colossal_menu_link.edit_form', [
-      'colossal_menu' => $link->getMenu()->id(),
+      'colossal_menu' => $link->getMenuName(),
       'colossal_menu_link' => $link->id(),
     ]);
   }

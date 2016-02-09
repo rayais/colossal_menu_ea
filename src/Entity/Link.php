@@ -45,7 +45,7 @@ use Drupal\link\LinkItemInterface;
  *   entity_keys = {
  *     "id" = "id",
  *     "bundle" = "type",
- *     "label" = "link",
+ *     "label" = "link__title",
  *     "uuid" = "uuid",
  *     "langcode" = "langcode",
  *   },
@@ -135,7 +135,7 @@ class Link extends ContentEntityBase implements LinkInterface {
         // Finally, copy the tree from the new parent.
         $result = $connection->select('colossal_menu_link_tree', 't')
           ->fields('t', ['ancestor', 'depth'])
-          ->condition('c.descendant', $this->getParent()->id())
+          ->condition('t.descendant', $this->getParent()->id())
           ->execute();
 
         while ($row = $result->fetchObject()) {
@@ -323,14 +323,14 @@ class Link extends ContentEntityBase implements LinkInterface {
    * {@inheritdoc}
    */
   public function getTitle() {
-    return $this->get('link')->title;
+    return $this->get('link')->first()->title;
   }
 
   /**
    * {@inheritdoc}
    */
   public function getDescription() {
-    return $this->get('link')->title;
+    return $this->get('link')->first()->title;
   }
 
   /**
@@ -366,7 +366,7 @@ class Link extends ContentEntityBase implements LinkInterface {
    * {@inheritdoc}
    */
   public function isEnabled() {
-    return (bool) $this->get('enabled');
+    return TRUE;
   }
 
   /**
@@ -394,36 +394,36 @@ class Link extends ContentEntityBase implements LinkInterface {
    * {@inheritdoc}
    */
   public function getRouteName() {
-    if ($this->get('link')->isExternal()) {
+    if ($this->get('link')->first()->getUrl()->isExternal()) {
       return '';
     }
 
-    return $this->get('link')->getUrl()->getRouteName();
+    return $this->get('link')->first()->getUrl()->getRouteName();
   }
 
   /**
    * {@inheritdoc}
    */
   public function getRouteParameters() {
-    if ($this->get('link')->isExternal()) {
+    if ($this->get('link')->first()->getUrl()->isExternal()) {
       return [];
     }
 
-    return $this->get('link')->getUrl()->getRouteParameters();
+    return $this->get('link')->first()->getUrl()->getRouteParameters();
   }
 
   /**
    * {@inheritdoc}
    */
   public function getUrlObject($title_attribute = TRUE) {
-    return $this->get('link')->getUrl();
+    return $this->get('link')->first()->getUrl();
   }
 
   /**
    * {@inheritdoc}
    */
   public function getOptions() {
-    return $this->get('link')->options;
+    return $this->get('link')->first()->options;
   }
 
   /**
@@ -505,7 +505,7 @@ class Link extends ContentEntityBase implements LinkInterface {
    * {@inheritdoc}
    */
   public function getPluginId() {
-    return 'colossal_menu_link:' . $this->get('uuid');
+    return 'colossal_menu_link:' . $this->get('uuid')->value;
   }
 
   /**
@@ -526,7 +526,7 @@ class Link extends ContentEntityBase implements LinkInterface {
    * {@inheritdoc}
    */
   public function getDerivativeId() {
-    return $this->get('uuid');
+    return $this->get('uuid')->value;
   }
 
   /**

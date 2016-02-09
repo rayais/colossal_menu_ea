@@ -25,7 +25,7 @@ class LinkAccessControlHandler extends EntityAccessControlHandler {
     /** @var \Drupal\colossal_menu\LinkInterface $entity */
     switch ($operation) {
       case 'view':
-        if (!$entity->isPublished()) {
+        if (!$entity->isEnabled()) {
           return AccessResult::allowedIfHasPermission($account, 'view unpublished link entities');
         }
         return AccessResult::allowedIfHasPermission($account, 'view published link entities');

@@ -11,6 +11,7 @@ use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\Core\Menu\MenuTreeStorageInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Url;
 
 /**
@@ -40,6 +41,13 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
   protected $storage;
 
   /**
+   * The current route match
+   *
+   * @var \Drupal\Core\Routing\RouteMatchInterface
+   */
+  protected $currentRouteMatch;
+
+  /**
    * The database table name.
    *
    * @var string
@@ -54,9 +62,10 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
    * @param string $table
    *   A database table name to store configuration data in.
    */
-  public function __construct(Connection $connection, EntityTypeManagerInterface $entity_type_manager, $entity_type, $table) {
+  public function __construct(Connection $connection, EntityTypeManagerInterface $entity_type_manager, RouteMatchInterface $current_route_match, $entity_type, $table) {
     $this->connection = $connection;
     $this->storage = $entity_type_manager->getStorage($entity_type);
+    $this->currentRouteMatch = $current_route_match;
     $this->table = $table;
   }
 
@@ -137,11 +146,13 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
    */
   public function loadTreeData($menu_name, MenuTreeParameters $parameters) {
     $query = $this->connection->select($this->table, 't')
-      ->fields('t', ['ancestor', 'descendant'])
-      ->innerJoin($this->storage->getEntityType()->get('base_table'), 'e', 't.ancestor = e.id')
+      ->fields('t', ['ancestor', 'descendant', 'depth'])
       ->condition('e.menu', $menu_name)
+      // The order is important!
       ->orderBy('t.depth', 'ASC')
-      ->orderBy('t.weight', 'ASC');
+      ->orderBy('e.weight', 'ASC');
+
+    $query->innerJoin($this->storage->getEntityType()->get('base_table'), 'e', 't.ancestor = e.id');
 
     if ($parameters->root) {
       $query->condition('t.ancestor', $parameters->root);
@@ -159,41 +170,83 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
 
     $result = $query->execute();
 
-    $tree = [];
+    $flat = [];
     while ($row = $result->fetchObject()) {
-      $tree[$row->ancestor][] = $row->descendant;
+      $flat[$row->ancestor][] = $row->descendant;
+      if (isset($depth[$row->descendant]) && $row->depth > $depth[$row->descendant]) {
+
+      }
+      else {
+        $depth[$row->descendant] = $row->depth;
+      }
+      $depth[$row->descendant] = $row->depth;
     }
 
-    $links = $this->loadMultiple(array_keys($tree));
+    $links = $this->loadMultiple(array_keys($flat));
 
     $routes = [];
     foreach ($links as $link) {
-      $url = Url::fromUri($link->get('link')->uri);
-      if (!$url->isExternal()) {
-        $routes[$link->id()] = $url->getRouteName();
+      if ($name = $link->getRouteName()) {
+        $routes[$link->id()] = $name;
       }
     }
 
-    $this->treeDataRecursive($tree);
+    $tree = $this->treeDataRecursive($flat, $links, $depth, $routes);
 
-    return [$tree, $routes];
+    return [
+      'tree' => $tree,
+      'route_names' => $routes,
+    ];
   }
 
   /**
    * Build the tree from the closure table.
    *
-   * @param array $tree
-   *   A fully built tree that will be modified.
-   * @param array $ancestors
-   *   An array of ancestors.
+   * @param array $flat
+   *   A flat tree returned from the database.
+   * @param array $links
+   *   An array of Link objects.
+   * @param array $depth
+   *   An array of depth values.
+   * @param array $routes
+   *   An array of route names.
+   *
+   * @return array
+   *   A fully-formed link tree.
    */
-  protected function treeDataRecursive(array &$tree, array $ancestors = []) {
-    if (count($ancestors) == 1) {
-      $tree[array_pop($ancestors)] = [];
-      return;
+  protected function treeDataRecursive(array $flat, array $links, array $depth, array $routes) {
+    uasort($flat, function($a, $b) {
+      return count($a) - count($b);
+    });
+
+    $tree = [];
+    foreach ($flat as $id => $decendents) {
+      foreach ($decendents as $decendent) {
+        if ($id == $decendent) {
+          $active = FALSE;
+          if ($this->currentRouteMatch->getRouteName() == $routes[$id]) {
+            $active = TRUE;
+          }
+
+          $tree[$id] = [
+            'link' => $links[$id],
+            'subtree' => [],
+            'depth' => $depth[$id] + 1,
+            'in_active_trail' => $active,
+          ];
+        }
+        else {
+          if (isset($tree[$decendent])) {
+            $tree[$id]['has_children'] = TRUE;
+            $tree[$id]['in_active_trail'] = $tree[$decendent]['in_active_trail'];
+            $tree[$id]['subtree'][$decendent] = $tree[$decendent];
+            unset($tree[$decendent]);
+          }
+        }
+      }
     }
-    $next = array_intersect($ancestors, array_keys($tree));
-    $this->treeDataRecursive($tree[array_pop($next)], array_diff($ancestors, $next));
+
+    return $tree;
   }
 
   /**
@@ -243,8 +296,8 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
    * {@inheritdoc}
    */
   public function getRootPathIds($id) {
-    return $this->conneciton->select($this->table, 't')
-      ->field('t', ['ancestor'])
+    return $this->connection->select($this->table, 't')
+      ->fields('t', ['ancestor'])
       ->condition('t.descendant', $id)
       ->orderBy('t.depth', 'DESC')
       ->execute()
@@ -255,15 +308,14 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
    * {@inheritdoc}
    */
   public function getExpanded($menu_name, array $parents) {
-    return $this->conneciton->select($this->table, 't')
-      ->field('t', ['descendant'])
-      ->innerJoin($this->storage->getEntityType()->get('base_table'), 'e', 't.ancestor = e.id')
+    $query = $this->connection->select($this->table, 't')
+      ->fields('t', ['descendant'])
       ->condition('t.ancestor', $parents)
       ->condition('e.menu', $menu_name)
       ->orderBy('t.depth', 'ASC')
-      ->orderBy('e.weight', 'ASC')
-      ->execute()
-      ->fetchCol();
+      ->orderBy('e.weight', 'ASC');
+    $query->innerJoin($this->storage->getEntityType()->get('base_table'), 'e', 't.ancestor = e.id');
+    return $query->execute()->fetchCol();
   }
 
   /**
@@ -271,7 +323,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
    */
   public function getSubtreeHeight($id) {
     return $this->conneciton->select($this->table, 't')
-      ->field('t', ['depth'])
+      ->fields('t', ['depth'])
       ->condition('t.descendant', $id)
       ->orderBy('t.depth', 'DESC')
       ->limit(0, 1)
@@ -296,7 +348,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
   public function getMenuNames() {
     return $this->connection->select($this->storage->getEntityType()->get('base_table'), 'e')
       ->distinct()
-      ->field('e', ['menu'])
+      ->fields('e', ['menu'])
       ->execute()
       ->fetchCol();
   }

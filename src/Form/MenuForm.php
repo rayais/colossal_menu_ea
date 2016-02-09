@@ -7,10 +7,10 @@
 
 namespace Drupal\colossal_menu\Form;
 
-use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Menu\MenuLinkTreeInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -28,10 +28,18 @@ class MenuForm extends EntityForm {
   protected $entityManager;
 
   /**
+   * Menu Tree.
+   *
+   * @var \Drupal\Core\Menu\MenuLinkTreeInterface
+   */
+  protected $menuLinkTree;
+
+  /**
    * Constructor.
    */
-  public function __construct(EntityManagerInterface $entity_manager) {
+  public function __construct(EntityManagerInterface $entity_manager, MenuLinkTreeInterface $menu_link_tree) {
     $this->entityManager = $entity_manager;
+    $this->menuLinkTree = $menu_link_tree;
   }
 
   /**
@@ -39,7 +47,8 @@ class MenuForm extends EntityForm {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('entity.manager')
+      $container->get('entity.manager'),
+      $container->get('colossal_menu.link_tree')
     );
   }
 

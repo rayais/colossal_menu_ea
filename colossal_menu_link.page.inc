@@ -22,9 +22,6 @@ use Drupal\Core\Url;
  *   - attributes: HTML attributes for the containing element.
  */
 function template_preprocess_colossal_menu_link(array &$variables) {
-  // Fetch Link Entity Object.
-  $colossal_menu_link = $variables['elements']['#colossal_menu_link'];
-
   // Helpful $content variable for templates.
   foreach (Element::children($variables['elements']) as $key) {
     $variables['content'][$key] = $variables['elements'][$key];
@@ -32,31 +29,35 @@ function template_preprocess_colossal_menu_link(array &$variables) {
 }
 
 /**
-* Prepares variables for a custom entity type creation list templates.
-*
-* Default template: colossal_menu_link-content-add-list.html.twig.
-*
-* @param array $variables
-*   An associative array containing:
-*   - content: An array of colossal_menu_link-types.
-*
-* @see block_content_add_page()
-*/
+ * Prepares variables for a custom entity type creation list templates.
+ *
+ * Default template: colossal_menu_link-content-add-list.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - content: An array of colossal_menu_link-types.
+ *
+ * @see block_content_add_page()
+ */
 function template_preprocess_colossal_menu_link_content_add_list(&$variables) {
   $variables['types'] = array();
   $query = \Drupal::request()->query->all();
   foreach ($variables['content'] as $type) {
-    $variables['types'][$type->id()] = array(
-      'link' => Link::fromTextAndUrl($type->label(), new Url('entity.colossal_menu_link.add_form', array(
-        'colossal_menu_link_type' => $type->id()
-      ), array('query' => $query))),
-      'description' => array(
-      '#markup' => $type->label(),
-      ),
+    $variables['types'][$type->id()] = [
+      'link' => Link::fromTextAndUrl($type->label(), new Url('entity.colossal_menu_link.add_form', [
+        'colossal_menu_link_type' => $type->id(),
+        'colossal_menu' => \Drupal::routeMatch()->getParameter('colossal_menu')->id(),
+      ],
+      [
+        'query' => $query,
+      ])),
+      'description' => [
+        '#markup' => $type->label(),
+      ],
       'title' => $type->label(),
-      'localized_options' => array(
-      'query' => $query,
-      ),
-    );
+      'localized_options' => [
+        'query' => $query,
+      ],
+    ];
   }
 }

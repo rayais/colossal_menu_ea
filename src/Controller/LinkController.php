@@ -68,14 +68,39 @@ class LinkController extends ControllerBase {
       return $this->addForm($colossal_menu, $type, $request);
     }
     if (count($types) === 0) {
-      return array(
+      return [
         '#markup' => $this->t('You have not created any %bundle types yet. @link to add a new type.', [
           '%bundle' => 'Link',
           '@link' => $this->l($this->t('Go to the type creation page'), Url::fromRoute('entity.colossal_menu_link_type.add_form')),
         ]),
-      );
+      ];
     }
-    return array('#theme' => 'colossal_menu_link_content_add_list', '#content' => $types);
+
+    $query = \Drupal::request()->query->all();
+    $links = [];
+    foreach ($types as $type) {
+      $links[$type->id()] = [
+        'link' => Link::fromTextAndUrl($type->label(), new Url('entity.colossal_menu_link.add_form', [
+          'colossal_menu_link_type' => $type->id(),
+          'colossal_menu' => \Drupal::routeMatch()->getParameter('colossal_menu')->id(),
+        ],
+        [
+          'query' => $query,
+        ])),
+        'description' => [
+          '#markup' => $type->label(),
+        ],
+        'title' => $type->label(),
+        'localized_options' => [
+          'query' => $query,
+        ],
+      ];
+    }
+
+    return [
+      '#theme' => 'colossal_menu_link_content_add_list',
+      '#content' => $types,
+    ];
   }
 
   /**
@@ -114,9 +139,9 @@ class LinkController extends ControllerBase {
    *   The page title.
    */
   public function getAddFormTitle(EntityInterface $colossal_menu_link_type) {
-    return t('Create of bundle @label',
-      array('@label' => $colossal_menu_link_type->label())
-    );
+    return t('Create of bundle @label', [
+      '@label' => $colossal_menu_link_type->label(),
+    ]);
   }
 
   /**
@@ -145,9 +170,9 @@ class LinkController extends ControllerBase {
    *   The page title.
    */
   public function getEditFormTitle(LinkInterface $colossal_menu_link) {
-    return t('Edit @label',
-      array('@label' => $colossal_menu_link->label())
-    );
+    return t('Edit @label', [
+      '@label' => $colossal_menu_link->label(),
+    ]);
   }
 
 }

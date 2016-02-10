@@ -458,7 +458,9 @@ class Link extends ContentEntityBase implements LinkInterface {
    * {@inheritdoc}
    */
   public function getPluginDefinition() {
-    return [];
+    return [
+      'enabled' => $this->isEnabled(),
+    ];
   }
 
   /**

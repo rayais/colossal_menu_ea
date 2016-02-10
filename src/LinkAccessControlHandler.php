@@ -26,9 +26,9 @@ class LinkAccessControlHandler extends EntityAccessControlHandler {
     switch ($operation) {
       case 'view':
         if (!$entity->isEnabled()) {
-          return AccessResult::allowedIfHasPermission($account, 'view unpublished link entities');
+          return AccessResult::allowedIfHasPermission($account, 'view disabled link entities');
         }
-        return AccessResult::allowedIfHasPermission($account, 'view published link entities');
+        return AccessResult::allowedIfHasPermission($account, 'view enabled link entities');
 
       case 'update':
         return AccessResult::allowedIfHasPermission($account, 'edit link entities');

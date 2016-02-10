@@ -12,8 +12,8 @@ delete link entities:
 edit link entities:
   title: 'Edit Link entities'
 
-view published link entities:
-  title: 'View published Link entities'
+view enabled link entities:
+  title: 'View enabled Link entities'
 
-view unpublished link entities:
-  title: 'View unpublished Link entities'
+view disabled link entities:
+  title: 'View disabled Link entities'

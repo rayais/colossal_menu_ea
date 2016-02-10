@@ -13,6 +13,7 @@ use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Url;
 use Drupal\colossal_menu\LinkInterface;
 use Drupal\link\LinkItemInterface;
 
@@ -126,7 +127,7 @@ class Link extends ContentEntityBase implements LinkInterface {
       // Then delete the comment tree above the current comment.
       if (!empty($ids)) {
         $connection->delete('colossal_menu_link_tree')
-          ->condition('descendant', $ids)
+          ->condition('descendant', $ids, 'IN')
           ->condition('ancestor', $ids, 'NOT IN')
           ->execute();
       }
@@ -207,31 +208,7 @@ class Link extends ContentEntityBase implements LinkInterface {
       ->setLabel(t('Parent'))
       ->setDescription(t('The parent item'))
       ->setSetting('target_type', 'colossal_menu_link')
-      ->setSetting('handler', 'default')
-      ->setDisplayOptions('form', [
-        'type' => 'entity_reference_autocomplete',
-        'weight' => 5,
-        'settings' => [
-          'match_operator' => 'CONTAINS',
-          'size' => '60',
-          'autocomplete_type' => 'tags',
-          'placeholder' => '',
-        ],
-      ])
-      ->setDisplayConfigurable('form', TRUE);
-
-    /*
-    $fields['name'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Link machine name'))
-      ->setDescription(t('The unique machine name for this menu item.'))
-      ->setRequired(TRUE)
-      ->setSetting('max_length', 255)
-      ->setPropertyConstraints('value', [
-        [
-          'UniqueField' => [],
-        ],
-      ]);
-      */
+      ->setSetting('handler', 'default');
 
     $fields['link'] = BaseFieldDefinition::create('link')
       ->setLabel(t('Link'))
@@ -247,43 +224,10 @@ class Link extends ContentEntityBase implements LinkInterface {
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('display', TRUE);
 
-
-    /*
-    $fields['show_title'] = BaseFieldDefinition::create('boolean')
-      ->setLabel(t('Show Title'))
-      ->setDescription(t('A flag for whether the title should be shown or not.'))
-      ->setDefaultValue(TRUE)
-      ->setDisplayOptions('view', array(
-        'label' => 'hidden',
-        'type' => 'boolean',
-        'weight' => -4,
-      ))
-      ->setDisplayOptions('form', array(
-        'settings' => array('display_label' => TRUE),
-        'weight' => -4,
-      ));
-     */
-
     $fields['weight'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Weight'))
       ->setDescription(t('Link weight among links in the same menu at the same depth. In the menu, the links with high weight will sink and links with a low weight will be positioned nearer the top.'))
       ->setDefaultValue(0);
-
-    /*
-    $fields['enabled'] = BaseFieldDefinition::create('boolean')
-      ->setLabel(t('Enabled'))
-      ->setDescription(t('A flag for whether the link should be enabled in menus or hidden.'))
-      ->setDefaultValue(TRUE)
-      ->setDisplayOptions('view', array(
-        'label' => 'hidden',
-        'type' => 'boolean',
-        'weight' => 0,
-      ))
-      ->setDisplayOptions('form', array(
-        'settings' => array('display_label' => TRUE),
-        'weight' => -1,
-      ));
-    */
 
     $fields['langcode'] = BaseFieldDefinition::create('language')
       ->setLabel(t('Language code'))
@@ -460,8 +404,9 @@ class Link extends ContentEntityBase implements LinkInterface {
    * {@inheritdoc}
    */
   public function getDeleteRoute() {
-    return Url::fromRoute($this->getEntityKey('handlers')['form']['delete'], [
+    return Url::fromRoute('entity.colossal_menu_link.delete_form', [
       'colossal_menu' => $this->getMenuName(),
+      'colossal_menu_link' => $this->id(),
     ]);
   }
 
@@ -469,8 +414,9 @@ class Link extends ContentEntityBase implements LinkInterface {
    * {@inheritdoc}
    */
   public function getEditRoute() {
-    return Url::fromRoute($this->getEntityKey('handlers')['form']['edit'], [
+    return Url::fromRoute('entity.colossal_menu_link.edit_form', [
       'colossal_menu' => $this->getMenuName(),
+      'colossal_menu_link' => $this->id(),
     ]);
   }
 

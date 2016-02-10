@@ -35,6 +35,7 @@ function colossal_menu_schema() {
       'indexes' => [
         'colossal_menu_link_tree_ancestor' => ['ancestor'],
         'colossal_menu_link_tree_descendant' => ['descendant'],
+        'colossal_menu_link_tree_depth' => ['depth'],
       ],
       'foreign keys' => [
         'colossal_menu_link_ancestor' => [

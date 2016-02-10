@@ -10,7 +10,10 @@ namespace Drupal\colossal_menu\Form;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Link;
 use Drupal\Core\Menu\MenuLinkTreeInterface;
+use Drupal\Core\Menu\MenuLinkTreeElement;
+use Drupal\Core\Menu\MenuTreeParameters;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -162,7 +165,7 @@ class MenuForm extends EntityForm {
 
     $form['links'] = [
       '#type' => 'table',
-      '#tree' => TRUE,
+      '#sorted' => TRUE,
       '#header' => [
         $this->t('Title'),
         $this->t('Weight'),
@@ -179,6 +182,7 @@ class MenuForm extends EntityForm {
           'subgroup' => 'link-parent',
           'source' => 'link-id',
           'hidden' => TRUE,
+          'limit' => $this->menuLinkTree->maxDepth(),
         ],
         [
           'action' => 'order',
@@ -188,67 +192,106 @@ class MenuForm extends EntityForm {
       ],
     ];
 
-    $storage = $this->entityManager->getStorage('colossal_menu_link');
-    $ids = $storage->getQuery()
-        ->condition('menu', $menu->id())
-        ->execute();
+    $params = new MenuTreeParameters();
+    $tree = $this->menuLinkTree->load($menu->id(), $params);
 
-    foreach ($storage->loadMultiple($ids) as $id => $link) {
-      $form['links'][$id] = [
-        '#weight' => $link->getWeight(),
-        '#attributes' => [
-          'class' => [
-            'draggable',
-          ],
-        ],
-      ];
-
-      $form['links'][$id]['indent'] = [
-        [
-          '#theme' => 'indentation',
-          '#size' => 0,
-        ],
-        [
-          '#plain_text' => $link->label(),
-        ],
-      ];
-
-      $form['links'][$id]['weight'] = [
-        '#type' => 'weight',
-        '#delta' => count($ids),
-        '#default_value' => $link->getWeight(),
-        '#title' => $this->t('Weight for @title', array('@title' => $link->getTitle())),
-        '#title_display' => 'invisible',
-        '#attributes' => [
-          'class' => [
-            'link-weight',
-          ],
-        ],
-      ];
-
-      $form['links'][$id]['id'] = [
-        '#type' => 'hidden',
-        '#value' => $id,
-        '#attributes' => [
-          'class' => [
-            'link-id',
-          ],
-        ],
-      ];
-
-      $form['links'][$id]['parent'] = array(
-        '#type' => 'hidden',
-        '#default_value' => ($link->getParent()) ? $link->getParent()->id() : 0,
-        '#attributes' => [
-          'class' => [
-            'link-parent',
-          ],
-        ],
-      );
-
+    $elements = [];
+    foreach ($tree as $item) {
+      $this->buildLinkElement($elements, $item);
     }
 
+    $form['links'] = $form['links'] + $elements;
+
     return $form;
+  }
+
+  /**
+   * Build an array of link elements.
+   *
+   * @param array $elements
+   *   An array of form elements to be filled.
+   * @param \Drupal\Core\Menu\MenuLinkTreeElement $item
+   *   Menu Link Tree element.
+   * @param int $depth
+   *   The current depth.
+   */
+  protected function buildLinkElement(&$elements, MenuLinkTreeElement $item, $depth = 0) {
+    $id = $item->link->id();
+    $link = $item->link;
+    $elements[$id] = [
+      '#weight' => $link->getWeight(),
+      '#attributes' => [
+        'class' => [
+          'draggable',
+        ],
+      ],
+    ];
+
+    $elements[$id]['indent'] = [
+      [
+        '#theme' => 'indentation',
+        '#size' => $depth,
+      ],
+      [
+        Link::fromTextAndUrl($link->getTitle(), $link->getUrlObject())->toRenderable(),
+      ],
+    ];
+
+    $elements[$id]['weight'] = [
+      '#type' => 'weight',
+      '#delta' => 50,
+      '#default_value' => $link->getWeight(),
+      '#title' => $this->t('Weight for @title', array('@title' => $link->getTitle())),
+      '#title_display' => 'invisible',
+      '#attributes' => [
+        'class' => [
+          'link-weight',
+        ],
+      ],
+    ];
+
+    $elements[$id]['operations'] = [
+      '#type' => 'operations',
+      '#links' => [
+        'edit' => [
+          'title' => $this->t('Edit'),
+          'url' => $link->getEditRoute(),
+          'query' => $this->getDestinationArray(),
+        ],
+        'delete' => [
+          'title' => $this->t('Delete'),
+          'url' => $link->getDeleteRoute(),
+          'query' => $this->getDestinationArray(),
+        ],
+      ],
+    ];
+
+    $elements[$id]['id'] = [
+      '#type' => 'hidden',
+      '#default_value' => $id,
+      '#attributes' => [
+        'class' => [
+          'link-id',
+        ],
+      ],
+    ];
+
+    $elements[$id]['parent'] = [
+      '#type' => 'hidden',
+      '#default_value' => ($link->getParent()) ? $link->getParent()->id() : 0,
+      '#attributes' => [
+        'class' => [
+          'link-parent',
+        ],
+      ],
+    ];
+
+    if (!empty($item->subtree)) {
+      $subdepth = $depth + 1;
+      foreach ($item->subtree as $subitem) {
+        $this->buildLinkElement($elements, $subitem, $subdepth);
+      }
+    }
   }
 
 }

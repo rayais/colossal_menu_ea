@@ -174,12 +174,11 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
     while ($row = $result->fetchObject()) {
       $flat[$row->ancestor][] = $row->descendant;
       if (isset($depth[$row->descendant]) && $row->depth > $depth[$row->descendant]) {
-
-      }
-      else {
         $depth[$row->descendant] = $row->depth;
       }
-      $depth[$row->descendant] = $row->depth;
+      elseif (!isset($depth[$row->descendant])) {
+        $depth[$row->descendant] = $row->depth;
+      }
     }
 
     $links = $this->loadMultiple(array_keys($flat));
@@ -230,6 +229,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
 
           $tree[$id] = [
             'link' => $links[$id],
+            'has_children' => FALSE,
             'subtree' => [],
             'depth' => $depth[$id] + 1,
             'in_active_trail' => $active,
@@ -241,9 +241,21 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
             $tree[$id]['in_active_trail'] = $tree[$decendent]['in_active_trail'];
             $tree[$id]['subtree'][$decendent] = $tree[$decendent];
             unset($tree[$decendent]);
+
+            if (count($tree[$id]['subtree']) > 1) {
+              uasort($tree[$id]['subtree'], function($a, $b) {
+                return ($a['link']->getWeight() < $b['link']->getWeight()) ? -1 : 1;
+              });
+            }
           }
         }
       }
+    }
+
+    if (count($tree) > 1) {
+      uasort($tree, function($a, $b) {
+        return ($a['link']->getWeight() < $b['link']->getWeight()) ? -1 : 1;
+      });
     }
 
     return $tree;

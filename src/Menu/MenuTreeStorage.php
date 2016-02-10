@@ -41,7 +41,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
   protected $storage;
 
   /**
-   * The current route match
+   * The current route match.
    *
    * @var \Drupal\Core\Routing\RouteMatchInterface
    */
@@ -171,6 +171,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
     $result = $query->execute();
 
     $flat = [];
+    $depth = [];
     while ($row = $result->fetchObject()) {
       $flat[$row->ancestor][] = $row->descendant;
       if (isset($depth[$row->descendant]) && $row->depth > $depth[$row->descendant]) {

@@ -7,17 +7,25 @@
 
 namespace Drupal\colossal_menu\Menu;
 
+use Drupal\Core\Controller\ControllerResolverInterface;
+use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Menu\MenuActiveTrailInterface;
 use Drupal\Core\Menu\MenuLinkTreeElement;
 use Drupal\Core\Menu\MenuLinkTree as CoreMenuLinkTree;
 use Drupal\Core\Menu\MenuTreeStorageInterface;
-use Drupal\Core\Controller\ControllerResolverInterface;
 use Drupal\Core\Routing\RouteProviderInterface;
 
 /**
  * Implements the loading, transforming and rendering of menu link trees.
  */
 class MenuLinkTree extends CoreMenuLinkTree {
+
+  /**
+   * Entity Manager.
+   *
+   * @var \Drupal\Core\Entity\EntityManagerInterface.
+   */
+  protected $entityManager;
 
   /**
    * Constructs a \Drupal\Core\Menu\MenuLinkTree object.
@@ -34,11 +42,13 @@ class MenuLinkTree extends CoreMenuLinkTree {
   public function __construct(MenuTreeStorageInterface $tree_storage,
                               RouteProviderInterface $route_provider,
                               MenuActiveTrailInterface $menu_active_trail,
-                              ControllerResolverInterface $controller_resolver) {
+                              ControllerResolverInterface $controller_resolver,
+                              EntityManagerInterface $entity_manager) {
     $this->treeStorage = $tree_storage;
     $this->routeProvider = $route_provider;
     $this->menuActiveTrail = $menu_active_trail;
     $this->controllerResolver = $controller_resolver;
+    $this->entityManager = $entity_manager;
   }
 
 
@@ -61,6 +71,40 @@ class MenuLinkTree extends CoreMenuLinkTree {
       );
     }
     return $tree;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function build(array $tree) {
+    $build = parent::build($tree);
+
+    // Use a custom theme.
+    if (isset($build['#theme'])) {
+      $build['#theme'] = 'colossal_menu__' . strtr($build['#menu_name'], '-', '_');
+    }
+
+    if (!empty($build['#items'])) {
+      $this->addItemContent($build['#items']);
+    }
+
+    return $build;
+  }
+
+  /**
+   * Add the Link Content.
+   *
+   * @param array $tree
+   *   Tree of links.
+   */
+  protected function addItemContent(array &$tree) {
+    foreach ($tree as &$item) {
+      $link = $item['original_link'];
+      $item['content'] = $this->entityManager->getViewBuilder($link->getEntityTypeId())->view($link, 'default');
+      if (!empty($item['below'])) {
+        $this->addItemContent($item['below']);
+      }
+    }
   }
 
 }

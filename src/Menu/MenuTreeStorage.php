@@ -224,7 +224,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
       foreach ($decendents as $decendent) {
         if ($id == $decendent) {
           $active = FALSE;
-          if ($this->currentRouteMatch->getRouteName() == $routes[$id]) {
+          if (isset($routes[$id]) && $this->currentRouteMatch->getRouteName() == $routes[$id]) {
             $active = TRUE;
           }
 

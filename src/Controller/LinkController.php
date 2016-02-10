@@ -79,27 +79,28 @@ class LinkController extends ControllerBase {
     $query = \Drupal::request()->query->all();
     $links = [];
     foreach ($types as $type) {
+      $params = [
+        'colossal_menu_link_type' => $type->id(),
+        'colossal_menu' => \Drupal::routeMatch()->getParameter('colossal_menu')->id(),
+      ];
+      $options = [
+        'query' => \Drupal::request()->query->all(),
+      ];
+      $url = new Url('entity.colossal_menu_link.add_form', $params, $options);
       $links[$type->id()] = [
-        'link' => Link::fromTextAndUrl($type->label(), new Url('entity.colossal_menu_link.add_form', [
-          'colossal_menu_link_type' => $type->id(),
-          'colossal_menu' => \Drupal::routeMatch()->getParameter('colossal_menu')->id(),
-        ],
-        [
-          'query' => $query,
-        ])),
-        'description' => [
-          '#markup' => $type->label(),
-        ],
+        'url' => $url,
         'title' => $type->label(),
-        'localized_options' => [
-          'query' => $query,
-        ],
       ];
     }
 
     return [
-      '#theme' => 'colossal_menu_link_content_add_list',
-      '#content' => $types,
+      '#theme' => 'links',
+      '#links' => $links,
+      '#attributes' => [
+        'class' => [
+          'admin-list',
+        ],
+      ],
     ];
   }
 

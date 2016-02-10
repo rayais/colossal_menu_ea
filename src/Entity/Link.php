@@ -124,7 +124,7 @@ class Link extends ContentEntityBase implements LinkInterface {
         $ids[] = $row->descendant;
       }
 
-      // Then delete the comment tree above the current comment.
+      // Then delete the link tree above the current link.
       if (!empty($ids)) {
         $connection->delete('colossal_menu_link_tree')
           ->condition('descendant', $ids, 'IN')

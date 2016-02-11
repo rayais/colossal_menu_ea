@@ -186,7 +186,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
 
     $routes = [];
     foreach ($links as $link) {
-      if ($name = $link->getRouteName()) {
+      if (!$link->isExternal() && $name = $link->getRouteName()) {
         $routes[$link->id()] = $name;
       }
     }

@@ -228,6 +228,17 @@ class Link extends ContentEntityBase implements LinkInterface {
         'weight' => -5,
       ));
 
+    $fields['show_title'] = BaseFieldDefinition::create('boolean')
+      ->setLabel(t('Show Title'))
+      ->setDescription(t('A flag for whether the title should be shown.'))
+      ->setDefaultValue(TRUE)
+      ->setDisplayOptions('form', [
+        'settings' => [
+          'display_label' => TRUE,
+        ],
+        'weight' => -4,
+      ]);
+
     $fields['link'] = BaseFieldDefinition::create('link')
       ->setLabel(t('Link'))
       ->setSettings(array(

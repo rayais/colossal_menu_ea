@@ -227,13 +227,23 @@ class MenuForm extends EntityForm {
       ],
     ];
 
+    $text = [];
+    if (!$link->isExternal() && $link->getRouteName() == '<none>') {
+      $text = [
+        '#plain_text' => $link->getTitle(),
+      ];
+    }
+    else {
+      $text = Link::fromTextAndUrl($link->getTitle(), $link->getUrlObject())->toRenderable();
+    }
+
     $elements[$id]['indent'] = [
       [
         '#theme' => 'indentation',
         '#size' => $depth,
       ],
       [
-        Link::fromTextAndUrl($link->getTitle(), $link->getUrlObject())->toRenderable(),
+        $text,
       ],
     ];
 

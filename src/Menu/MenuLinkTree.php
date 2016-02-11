@@ -92,7 +92,7 @@ class MenuLinkTree extends CoreMenuLinkTree {
   }
 
   /**
-   * Add the Link Content.
+   * Add the Link Content and add a no link variable.
    *
    * @param array $tree
    *   Tree of links.
@@ -100,6 +100,12 @@ class MenuLinkTree extends CoreMenuLinkTree {
   protected function addItemContent(array &$tree) {
     foreach ($tree as &$item) {
       $link = $item['original_link'];
+
+      $item['has_link'] = TRUE;
+      if (!$link->isExternal() && $link->getRouteName() == '<none>') {
+        $item['has_link'] = FALSE;
+      }
+
       $item['content'] = $this->entityManager->getViewBuilder($link->getEntityTypeId())->view($link, 'default');
       if (!empty($item['below'])) {
         $this->addItemContent($item['below']);

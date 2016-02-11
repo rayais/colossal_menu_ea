@@ -38,7 +38,11 @@
     {% endif %}
     {% for item in items %}
       <li{{ item.attributes }}>
-        {{ link(item.title, item.url) }}
+        {% if item.has_link %}
+          {{ link(item.title, item.url) }}
+        {% else %}
+          <span>{{ item.title }}</span>
+        {% endif %}
         {{ item.content }}
         {% if item.below %}
           {{ menus.menu_links(item.below, attributes, menu_level + 1) }}

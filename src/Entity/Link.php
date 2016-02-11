@@ -46,7 +46,7 @@ use Drupal\link\LinkItemInterface;
  *   entity_keys = {
  *     "id" = "id",
  *     "bundle" = "type",
- *     "label" = "link__title",
+ *     "label" = "title",
  *     "uuid" = "uuid",
  *     "langcode" = "langcode",
  *   },
@@ -69,6 +69,13 @@ class Link extends ContentEntityBase implements LinkInterface {
    * @var \DatabaseConnection
    */
   protected $connection;
+
+  /**
+   * Url Object.
+   *
+   * @var \Drupal\Core\Url
+   */
+  protected $url;
 
   /**
    * {@inheritdoc}
@@ -210,19 +217,28 @@ class Link extends ContentEntityBase implements LinkInterface {
       ->setSetting('target_type', 'colossal_menu_link')
       ->setSetting('handler', 'default');
 
+    $fields['title'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('Title'))
+      ->setDescription(t('The text to be used for this link in the menu.'))
+      ->setRequired(TRUE)
+      ->setTranslatable(TRUE)
+      ->setSetting('max_length', 255)
+      ->setDisplayOptions('form', array(
+        'type' => 'string_textfield',
+        'weight' => -5,
+      ));
+
     $fields['link'] = BaseFieldDefinition::create('link')
       ->setLabel(t('Link'))
-      ->setRequired(TRUE)
       ->setSettings(array(
         'link_type' => LinkItemInterface::LINK_GENERIC,
-        'title' => DRUPAL_REQUIRED,
+        'title' => DRUPAL_DISABLED,
       ))
       ->setDisplayOptions('form', array(
         'type' => 'link_default',
         'weight' => -2,
       ))
-      ->setDisplayConfigurable('form', TRUE)
-      ->setDisplayConfigurable('display', TRUE);
+      ->setDisplayConfigurable('form', TRUE);
 
     $fields['weight'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Weight'))
@@ -252,13 +268,6 @@ class Link extends ContentEntityBase implements LinkInterface {
   /**
    * {@inheritdoc}
    */
-  public function label() {
-    return $this->getTitle();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function getMenuName() {
     return $this->get('menu')->entity->id();
   }
@@ -267,14 +276,14 @@ class Link extends ContentEntityBase implements LinkInterface {
    * {@inheritdoc}
    */
   public function getTitle() {
-    return $this->get('link')->first()->title;
+    return $this->get('title')->value;
   }
 
   /**
    * {@inheritdoc}
    */
   public function getDescription() {
-    return $this->get('link')->first()->title;
+    return $this->get('title')->value;
   }
 
   /**
@@ -337,30 +346,38 @@ class Link extends ContentEntityBase implements LinkInterface {
   /**
    * {@inheritdoc}
    */
-  public function getRouteName() {
-    if ($this->get('link')->first()->getUrl()->isExternal()) {
-      return '';
-    }
+  public function isExternal() {
+    return $this->getUrlObject()->isExternal();
+  }
 
-    return $this->get('link')->first()->getUrl()->getRouteName();
+  /**
+   * {@inheritdoc}
+   */
+  public function getRouteName() {
+    return $this->getUrlObject()->getRouteName();
   }
 
   /**
    * {@inheritdoc}
    */
   public function getRouteParameters() {
-    if ($this->get('link')->first()->getUrl()->isExternal()) {
-      return [];
-    }
-
-    return $this->get('link')->first()->getUrl()->getRouteParameters();
+    return $this->getUrlObject()->getRouteParameters();
   }
 
   /**
    * {@inheritdoc}
    */
   public function getUrlObject($title_attribute = TRUE) {
-    return $this->get('link')->first()->getUrl();
+    if (!$this->url) {
+      if ($this->get('link')->isEmpty()) {
+        $this->url = Url::fromUri('internal:');
+      }
+      else {
+        $this->url = $this->get('link')->first()->getUrl();
+      }
+    }
+
+    return $this->url;
   }
 
   /**

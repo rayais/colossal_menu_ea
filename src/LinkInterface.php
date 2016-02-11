@@ -40,4 +40,12 @@ interface LinkInterface extends MenuLinkInterface, ContentEntityInterface, Entit
    */
   public function setWeight($weight);
 
+  /**
+   * Determines if link is external.
+   *
+   * @return bool
+   *   Whether the current link is external or not.
+   */
+  public function isExternal();
+
 }

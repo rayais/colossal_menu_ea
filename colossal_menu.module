@@ -44,9 +44,9 @@ function template_preprocess_colossal_menu_link(array &$variables) {
  * Implements hook_block_view_BASE_BLOCK_ID_alter().
  */
 function colossal_menu_block_view_colossal_menu_block_alter(array &$build, BlockPluginInterface $block) {
-    $build['#contextual_links']['colossal_menu'] = [
-      'route_parameters' => [
-        'colossal_menu' => $block->getDerivativeId(),
-      ],
-    ];
+  $build['#contextual_links']['colossal_menu'] = [
+    'route_parameters' => [
+      'colossal_menu' => $block->getDerivativeId(),
+    ],
+  ];
 }

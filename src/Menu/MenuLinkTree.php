@@ -101,6 +101,8 @@ class MenuLinkTree extends CoreMenuLinkTree {
     foreach ($tree as &$item) {
       $link = $item['original_link'];
 
+      $item['show_title'] = $link->showTitle();
+
       $item['has_link'] = TRUE;
       if (!$link->isExternal() && $link->getRouteName() == '<none>') {
         $item['has_link'] = FALSE;

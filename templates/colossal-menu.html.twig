@@ -38,10 +38,12 @@
     {% endif %}
     {% for item in items %}
       <li{{ item.attributes }}>
-        {% if item.has_link %}
-          {{ link(item.title, item.url) }}
-        {% else %}
-          <span>{{ item.title }}</span>
+        {% if item.show_title %}
+          {% if item.has_link %}
+            {{ link(item.title, item.url) }}
+          {% else %}
+            <span>{{ item.title }}</span>
+          {% endif %}
         {% endif %}
         {{ item.content }}
         {% if item.below %}

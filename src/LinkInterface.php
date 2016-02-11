@@ -48,4 +48,12 @@ interface LinkInterface extends MenuLinkInterface, ContentEntityInterface, Entit
    */
   public function isExternal();
 
+  /**
+   * Determines if the title should be shown.
+   *
+   * @return bool
+   *   Whether the title should be shown or not.
+   */
+  public function showTitle();
+
 }

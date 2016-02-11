@@ -230,7 +230,7 @@ class Link extends ContentEntityBase implements LinkInterface {
 
     $fields['show_title'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('Show Title'))
-      ->setDescription(t('A flag for whether the title should be shown.'))
+      ->setDescription(t('A flag for whether the title should be shown in menus or hidden.'))
       ->setDefaultValue(TRUE)
       ->setDisplayOptions('form', [
         'settings' => [
@@ -359,6 +359,13 @@ class Link extends ContentEntityBase implements LinkInterface {
    */
   public function isExternal() {
     return $this->getUrlObject()->isExternal();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function showTitle() {
+    return (bool) $this->get('show_title')->value;
   }
 
   /**

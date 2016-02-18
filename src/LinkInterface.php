@@ -41,6 +41,17 @@ interface LinkInterface extends MenuLinkInterface, ContentEntityInterface, Entit
   public function setWeight($weight);
 
   /**
+   * Sets the enabled status.
+   *
+   * @param bool $enabled
+   *   The enabled status.
+   *
+   * @return \Drupal\colossal_menu\LinkInterface
+   *   Return this.
+   */
+  public function setEnabled($enabled);
+
+  /**
    * Gets the machine name.
    *
    * @return string

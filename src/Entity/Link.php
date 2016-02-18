@@ -271,6 +271,15 @@ class Link extends ContentEntityBase implements LinkInterface {
       ))
       ->setDisplayConfigurable('form', TRUE);
 
+    $fields['enabled'] = BaseFieldDefinition::create('boolean')
+      ->setLabel(t('Enabled'))
+      ->setDescription(t('A flag for whether the link should be enabled in menus or hidden.'))
+      ->setDefaultValue(TRUE)
+      ->setDisplayOptions('form', array(
+        'settings' => array('display_label' => TRUE),
+        'weight' => -1,
+      ));
+
     $fields['weight'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Weight'))
       ->setDescription(t('Link weight among links in the same menu at the same depth. In the menu, the links with high weight will sink and links with a low weight will be positioned nearer the top.'))
@@ -331,6 +340,12 @@ class Link extends ContentEntityBase implements LinkInterface {
     return $this->set('weight', $weight);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function setEnabled($enabled) {
+    return $this->set('enabled', $enabled);
+  }
 
   /**
    * {@inheritdoc}
@@ -350,7 +365,7 @@ class Link extends ContentEntityBase implements LinkInterface {
    * {@inheritdoc}
    */
   public function isEnabled() {
-    return TRUE;
+    return (bool) $this->get('enabled')->value;
   }
 
   /**

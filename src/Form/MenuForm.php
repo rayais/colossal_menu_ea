@@ -136,6 +136,7 @@ class MenuForm extends EntityForm {
 
       $link->setParent($input['parent']);
       $link->setWeight($input['weight']);
+      $link->setEnabled($input['enabled']);
       $link->save();
     }
   }
@@ -168,6 +169,7 @@ class MenuForm extends EntityForm {
       '#sorted' => TRUE,
       '#header' => [
         $this->t('Title'),
+        $this->t('Enabled'),
         $this->t('Weight'),
         [
           'data' => $this->t('Operations'),
@@ -245,6 +247,13 @@ class MenuForm extends EntityForm {
       [
         $text,
       ],
+    ];
+
+    $elements[$id]['enabled'] = [
+      '#type' => 'checkbox',
+      '#default_value' => $link->isEnabled(),
+      '#title' => $this->t('Enabled'),
+      '#title_display' => 'invisible',
     ];
 
     $elements[$id]['weight'] = [

@@ -223,10 +223,30 @@ class Link extends ContentEntityBase implements LinkInterface {
       ->setRequired(TRUE)
       ->setTranslatable(TRUE)
       ->setSetting('max_length', 255)
-      ->setDisplayOptions('form', array(
+      ->setDisplayOptions('form', [
         'type' => 'string_textfield',
         'weight' => -5,
-      ));
+      ]);
+
+    $fields['machine_name'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('Machine name'))
+      ->setDescription(t('Machine name of the menu link'))
+      ->setRequired(TRUE)
+      ->setSetting('max_length', 255)
+      ->addConstraint('UniqueField', [])
+      ->setDisplayOptions('form', [
+        'type' => 'machine_name',
+        'weight' => -4,
+        'settings' => [
+          'source' => [
+            'title',
+            'widget',
+            0,
+            'value',
+          ],
+          'exists' => '\Drupal\colossal_menu\Entity\Link::loadByMachineName',
+        ],
+      ]);
 
     $fields['show_title'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('Show Title'))
@@ -510,6 +530,32 @@ class Link extends ContentEntityBase implements LinkInterface {
    */
   public function getDerivativeId() {
     return $this->get('uuid')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getMachineName() {
+    return $this->get('machine_name')->value;
+  }
+
+  /**
+   * Checks that an existing machine name does not already exist.
+   *
+   * This is a static mehod so it can be used by a machine name field.
+   *
+   * @param string $machine_name
+   *   The machine name to load the entity by.
+   *
+   * @return \Drupal\colossal_menu\Entity\Link|NULL
+   *   Loaded Link entity or NULL if not found.
+   */
+  public static function loadByMachineName($machine_name) {
+    $storage = \Drupal::service('entity.manager')->getStorage('colossal_menu_link');
+    $result = $storage->getQuery()
+      ->condition('machine_name', $machine_name)
+      ->execute();
+    return $result ? $storage->loadMultiple($result) : array();
   }
 
   /**

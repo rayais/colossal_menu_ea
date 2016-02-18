@@ -3,3 +3,5 @@ type: module
 description: Menu of epic proportions
 core: 8.x
 package: Menu
+dependencies:
+  - machine_name_widget

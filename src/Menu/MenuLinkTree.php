@@ -7,6 +7,7 @@
 
 namespace Drupal\colossal_menu\Menu;
 
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Controller\ControllerResolverInterface;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\Core\Menu\MenuActiveTrailInterface;
@@ -102,6 +103,7 @@ class MenuLinkTree extends CoreMenuLinkTree {
       $link = $item['original_link'];
 
       $item['show_title'] = $link->showTitle();
+      $item['identifier'] = Html::cleanCssIdentifier($link->getMachineName());
 
       $item['has_link'] = TRUE;
       if (!$link->isExternal() && $link->getRouteName() == '<none>') {

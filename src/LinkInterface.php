@@ -41,6 +41,14 @@ interface LinkInterface extends MenuLinkInterface, ContentEntityInterface, Entit
   public function setWeight($weight);
 
   /**
+   * Gets the machine name.
+   *
+   * @return string
+   *   Machine name.
+   */
+  public function getMachineName();
+
+  /**
    * Determines if link is external.
    *
    * @return bool

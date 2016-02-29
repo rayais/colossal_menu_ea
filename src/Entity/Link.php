@@ -444,7 +444,7 @@ class Link extends ContentEntityBase implements LinkInterface {
    * {@inheritdoc}
    */
   public function getMetaData() {
-    return [];
+    return $this->toArray();
   }
 
   /**

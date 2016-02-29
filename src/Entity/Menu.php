@@ -35,7 +35,6 @@ use Drupal\colossal_menu\MenuInterface;
  *     "uuid" = "uuid"
  *   },
  *   links = {
- *     "canonical" = "/admin/structure/colossal_menu/{colossal_menu}",
  *     "add-form" = "/admin/structure/colossal_menu/add",
  *     "edit-form" = "/admin/structure/colossal_menu/{colossal_menu}/edit",
  *     "delete-form" = "/admin/structure/colossal_menu/{colossal_menu}/delete",

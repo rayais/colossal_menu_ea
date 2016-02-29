@@ -11,7 +11,7 @@ use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Url;
-use Drupal\colossal_menu\MenuInterface;
+use Drupal\system\MenuInterface;
 use Drupal\colossal_menu\LinkInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;

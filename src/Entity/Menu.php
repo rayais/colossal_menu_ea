@@ -8,7 +8,7 @@
 namespace Drupal\colossal_menu\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
-use Drupal\colossal_menu\MenuInterface;
+use Drupal\system\MenuInterface;
 
 /**
  * Defines the Menu entity.
@@ -56,5 +56,19 @@ class Menu extends ConfigEntityBundleBase implements MenuInterface {
    * @var string
    */
   protected $label;
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getDescription() {
+    return $this->label;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isLocked() {
+    return FALSE;
+  }
 
 }

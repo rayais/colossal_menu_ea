@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   id = "colossal_menu_tree",
  *   label = @Translation("Colossal Menu Tree"),
  *   uri_paths = {
- *     "canonical" = "/entity/colossal_menu/{menu}/tree"
+ *     "canonical" = "/entity/colossal_menu/{colossal_menu}/tree"
  *   }
  * )
  */
@@ -35,6 +35,19 @@ class MenuTreeResource extends BaseMenuTreeResource {
       $container->get('logger.factory')->get('rest'),
       $container->get('colossal_menu.link_tree')
     );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getBaseRoute($canonical_path, $method) {
+    $route = parent::getBaseRoute($canonical_path, $method);
+
+    $parameters = $route->getOption('parameters') ?: array();
+    $parameters['colossal_menu']['type'] = 'entity:colossal_menu';
+    $route->setOption('parameters', $parameters);
+
+    return $route;
   }
 
 }

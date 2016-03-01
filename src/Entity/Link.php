@@ -407,14 +407,22 @@ class Link extends ContentEntityBase implements LinkInterface {
    * {@inheritdoc}
    */
   public function getRouteName() {
-    return $this->getUrlObject()->getRouteName();
+    if ($this->getUrlObject()->isRouted()) {
+      return $this->getUrlObject()->getRouteName();
+    }
+
+    return '';
   }
 
   /**
    * {@inheritdoc}
    */
   public function getRouteParameters() {
-    return $this->getUrlObject()->getRouteParameters();
+    if ($this->getUrlObject()->isRouted()) {
+      return $this->getUrlObject()->getRouteParameters();
+    }
+
+    return [];
   }
 
   /**

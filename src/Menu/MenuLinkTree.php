@@ -7,6 +7,7 @@
 
 namespace Drupal\colossal_menu\Menu;
 
+use Drupal\Core\Access\AccessibleInterface;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Controller\ControllerResolverInterface;
 use Drupal\Core\Entity\EntityManagerInterface;
@@ -70,6 +71,10 @@ class MenuLinkTree extends CoreMenuLinkTree {
         (bool) $element['in_active_trail'],
         $subtree
       );
+
+      if ($tree[$key]->link instanceof AccessibleInterface) {
+        $tree[$key]->access = $tree[$key]->link->access('view');
+      }
     }
     return $tree;
   }

@@ -21,7 +21,7 @@ Rather than modifying the core
 which could change the assumptions of how a menu works; we'll instead create our
 own system that can have it's own assumptions.
 
-This modules does **not** seek to be fully compatible with the core
+This module does **not** seek to be fully compatible with the core
 [Menu System](https://api.drupal.org/api/drupal/core!lib!Drupal!Core!Menu!menu.api.php/group/menu/8)
 as a drop-in replacement; but instead should be used alongside it.
 

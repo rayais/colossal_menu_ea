@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\colossal_menu\Form\MenuForm.
- */
-
 namespace Drupal\colossal_menu\Form;
 
 use Drupal\Core\Entity\EntityForm;
@@ -134,10 +129,30 @@ class MenuForm extends EntityForm {
       $storage = $this->entityManager->getStorage('colossal_menu_link');
       $link = $storage->load($id);
 
-      $link->setParent($input['parent']);
-      $link->setWeight($input['weight']);
-      $link->setEnabled($input['enabled']);
-      $link->save();
+      $diff = FALSE;
+
+      if (!$link->getParent() && $input['parent']) {
+        $diff = TRUE;
+        $link->setParent($input['parent']);
+      }
+      elseif ($link->getParent() && $link->getParent()->id() != $input['parent']) {
+        $diff = TRUE;
+        $link->setParent($input['parent']);
+      }
+
+      if ($link->getWeight() != $input['weight']) {
+        $diff = TRUE;
+        $link->setWeight($input['weight']);
+      }
+
+      if ($link->isEnabled() != (bool) $input['enabled']) {
+        $diff = TRUE;
+        $link->setEnabled($input['enabled']);
+      }
+
+      if ($diff) {
+        $link->save();
+      }
     }
   }
 

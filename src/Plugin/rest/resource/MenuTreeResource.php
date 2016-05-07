@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\menu_tree\Plugin\rest\resource\MenuTreeResource.
- */
-
 namespace Drupal\colossal_menu\Plugin\rest\resource;
 
 use Drupal\rest_menu_tree\Plugin\rest\resource\MenuTreeResource as BaseMenuTreeResource;
@@ -33,7 +28,8 @@ class MenuTreeResource extends BaseMenuTreeResource {
       $plugin_definition,
       $container->getParameter('serializer.formats'),
       $container->get('logger.factory')->get('rest'),
-      $container->get('colossal_menu.link_tree')
+      $container->get('colossal_menu.link_tree'),
+      $container->get('entity.manager')
     );
   }
 

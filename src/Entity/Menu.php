@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\colossal_menu\Entity\Menu.
- */
-
 namespace Drupal\colossal_menu\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
@@ -26,6 +21,7 @@ use Drupal\system\MenuInterface;
  *     "route_provider" = {
  *       "html" = "Drupal\Core\Entity\Routing\AdminHtmlRouteProvider",
  *     },
+ *     "access" = "Drupal\colossal_menu\MenuAccessControlHandler",
  *   },
  *   config_prefix = "menu",
  *   admin_permission = "administer site configuration",

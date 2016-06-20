@@ -1,19 +1,37 @@
-add link entities:
-  title: 'Create new Link entities'
+# Menu
+colossal_menu overview:
+  title: 'Menu Overview'
+  description: "Allow access to the Menu overview form."
 
-administer link entities:
-  title: 'Administer Link entities'
-  description: 'Allow to access the administration form to configure Link entities.'
+add colossal_menu:
+  title: 'Add Menus'
+
+delete colossal_menu:
+  title: 'Delete Menus'
+
+edit colossal_menu:
+  title: 'Edit Menus'
+
+view colossal_menu:
+  title: 'View Menus'
+
+# Link.
+administer colossal_menu_link:
+  title: 'Administer Links'
+  description: 'Allow access to the administration form to configure Links.'
   restrict access: true
 
-delete link entities:
-  title: 'Delete Link entities'
+add colossal_menu_link:
+  title: 'Create new Links'
 
-edit link entities:
-  title: 'Edit Link entities'
+delete colossal_menu_link:
+  title: 'Delete Links'
 
-view enabled link entities:
-  title: 'View enabled Link entities'
+edit colossal_menu_link:
+  title: 'Edit Links'
 
-view disabled link entities:
-  title: 'View disabled Link entities'
+view enabled colossal_menu_link:
+  title: 'View enabled Links'
+
+view disabled colossal_menu_link:
+  title: 'View disabled Links'

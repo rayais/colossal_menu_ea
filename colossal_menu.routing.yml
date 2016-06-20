@@ -7,7 +7,7 @@ entity.colossal_menu.collection:
   options:
     _admin_route: TRUE
   requirements:
-    _permission: 'administer site configuration'
+    _permission: 'colossal_menu overview'
 
 entity.colossal_menu.add_form:
   path: '/admin/structure/colossal_menu/add'

@@ -237,12 +237,11 @@ class MenuForm extends EntityForm {
     $link = $item->link;
     $elements[$id] = [
       '#weight' => $link->getWeight(),
-      '#attributes' => [
-        'class' => [
-          'draggable',
-        ],
-      ],
     ];
+
+    if ($link->get('parent')->access('edit') && $link->get('weight')->access('edit')) {
+      $elements[$id]['#attributes']['class'][] = 'draggable';
+    }
 
     $text = [];
     if (!$link->isExternal() && $link->getRouteName() == '<none>') {
@@ -264,12 +263,19 @@ class MenuForm extends EntityForm {
       ],
     ];
 
-    $elements[$id]['enabled'] = [
-      '#type' => 'checkbox',
-      '#default_value' => $link->isEnabled(),
-      '#title' => $this->t('Enabled'),
-      '#title_display' => 'invisible',
-    ];
+    if ($link->get('enabled')->access('edit')) {
+      $elements[$id]['enabled'] = [
+        '#type' => 'checkbox',
+        '#default_value' => $link->isEnabled(),
+        '#title' => $this->t('Enabled'),
+        '#title_display' => 'invisible',
+      ];
+    }
+    else {
+      $elements[$id]['enabled'] = [
+        '#markup' => $link->isEnabled() ? $this->t('Enabled') : $this->t('Disabled'),
+      ];
+    }
 
     $elements[$id]['weight'] = [
       '#type' => 'weight',
@@ -282,22 +288,28 @@ class MenuForm extends EntityForm {
           'link-weight',
         ],
       ],
+      '#access' => $link->get('weight')->access('edit'),
     ];
+
+    $operations = [];
+    if ($link->access('update')) {
+      $operations['edit'] = [
+        'title' => $this->t('Edit'),
+        'url' => $link->getEditRoute(),
+        'query' => $this->getDestinationArray(),
+      ];
+    }
+    if ($link->access('delete')) {
+      $operations['edit'] = [
+        'title' => $this->t('Delete'),
+        'url' => $link->getDeleteRoute(),
+        'query' => $this->getDestinationArray(),
+      ];
+    }
 
     $elements[$id]['operations'] = [
       '#type' => 'operations',
-      '#links' => [
-        'edit' => [
-          'title' => $this->t('Edit'),
-          'url' => $link->getEditRoute(),
-          'query' => $this->getDestinationArray(),
-        ],
-        'delete' => [
-          'title' => $this->t('Delete'),
-          'url' => $link->getDeleteRoute(),
-          'query' => $this->getDestinationArray(),
-        ],
-      ],
+      '#links' => $operations,
     ];
 
     $elements[$id]['id'] = [
@@ -318,6 +330,7 @@ class MenuForm extends EntityForm {
           'link-parent',
         ],
       ],
+      '#access' => $link->get('parent')->access('edit'),
     ];
 
     if (!empty($item->subtree)) {

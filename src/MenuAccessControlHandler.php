@@ -8,11 +8,11 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Access\AccessResult;
 
 /**
- * Access controller for the Link entity.
+ * Access controller for the Menu entity.
  *
- * @see \Drupal\colossal_menu\Entity\Link.
+ * @see \Drupal\colossal_menu\Entity\Menu.
  */
-class LinkAccessControlHandler extends EntityAccessControlHandler {
+class MenuAccessControlHandler extends EntityAccessControlHandler {
 
   /**
    * {@inheritdoc}
@@ -22,15 +22,15 @@ class LinkAccessControlHandler extends EntityAccessControlHandler {
     switch ($operation) {
       case 'view':
         if (!$entity->isEnabled()) {
-          return AccessResult::allowedIfHasPermission($account, 'view disabled colossal_menu_link');
+          return AccessResult::allowedIfHasPermission($account, 'view disabled colossal_menu');
         }
-        return AccessResult::allowedIfHasPermission($account, 'view enabled colossal_menu_link');
+        return AccessResult::allowedIfHasPermission($account, 'view enabled colossal_menu');
 
       case 'update':
-        return AccessResult::allowedIfHasPermission($account, 'edit colossal_menu_link');
+        return AccessResult::allowedIfHasPermission($account, 'edit colossal_menu');
 
       case 'delete':
-        return AccessResult::allowedIfHasPermission($account, 'delete colossal_menu_link');
+        return AccessResult::allowedIfHasPermission($account, 'delete colossal_menu');
     }
 
     return AccessResult::allowed();
@@ -40,7 +40,7 @@ class LinkAccessControlHandler extends EntityAccessControlHandler {
    * {@inheritdoc}
    */
   protected function checkCreateAccess(AccountInterface $account, array $context, $entity_bundle = NULL) {
-    return AccessResult::allowedIfHasPermission($account, 'add colossal_menu_link');
+    return AccessResult::allowedIfHasPermission($account, 'add colossal_menu');
   }
 
 }

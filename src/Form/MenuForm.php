@@ -291,6 +291,7 @@ class MenuForm extends EntityForm {
       '#access' => $link->get('weight')->access('edit'),
     ];
 
+    $operations = [];
     if ($link->access('update')) {
       $operations['edit'] = [
         'title' => $this->t('Edit'),

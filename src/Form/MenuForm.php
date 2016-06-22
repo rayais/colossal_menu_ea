@@ -291,7 +291,6 @@ class MenuForm extends EntityForm {
       '#access' => $link->get('weight')->access('edit'),
     ];
 
-    $operations = [];
     if ($link->access('update')) {
       $operations['edit'] = [
         'title' => $this->t('Edit'),
@@ -300,7 +299,7 @@ class MenuForm extends EntityForm {
       ];
     }
     if ($link->access('delete')) {
-      $operations['edit'] = [
+      $operations['delete'] = [
         'title' => $this->t('Delete'),
         'url' => $link->getDeleteRoute(),
         'query' => $this->getDestinationArray(),

@@ -131,7 +131,7 @@ class MenuForm extends EntityForm {
 
       $diff = FALSE;
 
-      if (isset($input['parent']) && $link->get('parent')->access('edit')) {
+      if (array_key_exists('parent', $input) && $link->get('parent')->access('edit')) {
         if (!$link->getParent() && $input['parent']) {
           $diff = TRUE;
           $link->setParent($input['parent']);
@@ -142,17 +142,18 @@ class MenuForm extends EntityForm {
         }
       }
 
-      if (isset($input['weight']) && $link->get('weight')->access('edit')) {
+      if (array_key_exists('weight', $input) && $link->get('weight')->access('edit')) {
         if ($link->getWeight() != $input['weight']) {
           $diff = TRUE;
           $link->setWeight($input['weight']);
         }
       }
 
-      if (isset($input['enabled']) && $link->get('enabled')->access('edit')) {
-        if ($link->isEnabled() != (bool) $input['enabled']) {
+      if (array_key_exists('enabled', $input) && $link->get('enabled')->access('edit')) {
+        $enabled = (bool) $input['enabled'];
+        if ($link->isEnabled() != $enabled) {
           $diff = TRUE;
-          $link->setEnabled($input['enabled']);
+          $link->setEnabled($enabled);
         }
       }
 

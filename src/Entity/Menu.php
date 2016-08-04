@@ -2,7 +2,7 @@
 
 namespace Drupal\colossal_menu\Entity;
 
-use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
+use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\system\MenuInterface;
 
 /**
@@ -38,7 +38,7 @@ use Drupal\system\MenuInterface;
  *   }
  * )
  */
-class Menu extends ConfigEntityBundleBase implements MenuInterface {
+class Menu extends ConfigEntityBase implements MenuInterface {
   /**
    * The Menu ID.
    *

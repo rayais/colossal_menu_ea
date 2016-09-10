@@ -73,7 +73,7 @@ class MenuLinkTree extends CoreMenuLinkTree {
       );
 
       if ($tree[$key]->link instanceof AccessibleInterface) {
-        $tree[$key]->access = $tree[$key]->link->access('view');
+        $tree[$key]->access = $tree[$key]->link->access('view', NULL, TRUE);
       }
     }
     return $tree;

@@ -261,24 +261,24 @@ class Link extends ContentEntityBase implements LinkInterface {
 
     $fields['link'] = BaseFieldDefinition::create('link')
       ->setLabel(t('Link'))
-      ->setSettings(array(
+      ->setSettings([
         'link_type' => LinkItemInterface::LINK_GENERIC,
         'title' => DRUPAL_DISABLED,
-      ))
-      ->setDisplayOptions('form', array(
+      ])
+      ->setDisplayOptions('form', [
         'type' => 'link_default',
         'weight' => -2,
-      ))
+      ])
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['enabled'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('Enabled'))
       ->setDescription(t('A flag for whether the link should be enabled in menus or hidden.'))
       ->setDefaultValue(TRUE)
-      ->setDisplayOptions('form', array(
-        'settings' => array('display_label' => TRUE),
+      ->setDisplayOptions('form', [
+        'settings' => ['display_label' => TRUE],
         'weight' => -1,
-      ));
+      ]);
 
     $fields['weight'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Weight'))
@@ -288,10 +288,10 @@ class Link extends ContentEntityBase implements LinkInterface {
     $fields['langcode'] = BaseFieldDefinition::create('language')
       ->setLabel(t('Language code'))
       ->setDescription(t('The language code for the Link entity.'))
-      ->setDisplayOptions('form', array(
+      ->setDisplayOptions('form', [
         'type' => 'language_select',
         'weight' => 10,
-      ))
+      ])
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['created'] = BaseFieldDefinition::create('created')
@@ -578,7 +578,7 @@ class Link extends ContentEntityBase implements LinkInterface {
     $result = $storage->getQuery()
       ->condition('machine_name', $machine_name)
       ->execute();
-    return $result ? $storage->loadMultiple($result) : array();
+    return $result ? $storage->loadMultiple($result) : [];
   }
 
   /**

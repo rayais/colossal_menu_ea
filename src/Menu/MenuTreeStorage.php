@@ -114,7 +114,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
   /**
    * {@inheritdoc}
    */
-  public function loadByRoute($route_name, array $route_parameters = array(), $menu_name = NULL) {
+  public function loadByRoute($route_name, array $route_parameters = [], $menu_name = NULL) {
     $url = new Url($route_name, $route_parameters);
 
     $query = $this->storage->getQuery();

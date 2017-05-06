@@ -123,10 +123,10 @@ class LinkController extends ControllerBase {
   public function addForm(MenuInterface $colossal_menu,
                           EntityInterface $colossal_menu_link_type,
                           Request $request) {
-    $entity = $this->storage->create(array(
+    $entity = $this->storage->create([
       'type' => $colossal_menu_link_type->id(),
       'menu' => $colossal_menu,
-    ));
+    ]);
     return $this->entityFormBuilder()->getForm($entity);
   }
 

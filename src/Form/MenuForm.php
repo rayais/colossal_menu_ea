@@ -56,23 +56,23 @@ class MenuForm extends EntityForm {
   public function form(array $form, FormStateInterface $form_state) {
     $menu = $this->entity;
 
-    $form['label'] = array(
+    $form['label'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Label'),
       '#maxlength' => 255,
       '#default_value' => $menu->label(),
       '#description' => $this->t("Label for the Menu."),
       '#required' => TRUE,
-    );
+    ];
 
-    $form['id'] = array(
+    $form['id'] = [
       '#type' => 'machine_name',
       '#default_value' => $menu->id(),
-      '#machine_name' => array(
+      '#machine_name' => [
         'exists' => '\Drupal\colossal_menu\Entity\Menu::load',
-      ),
+      ],
       '#disabled' => !$menu->isNew(),
-    );
+    ];
 
     // Add menu links administration form for existing menus.
     if (!$menu->isNew()) {
@@ -82,7 +82,7 @@ class MenuForm extends EntityForm {
       // the parents of the form section.
       // @see self::submitOverviewForm()
       $form_state->set('links', ['links']);
-      $form['links'] = array();
+      $form['links'] = [];
       $form['links'] = $this->buildOverviewForm($form['links'], $form_state);
     }
 
@@ -288,7 +288,7 @@ class MenuForm extends EntityForm {
       '#type' => 'weight',
       '#delta' => 50,
       '#default_value' => $link->getWeight(),
-      '#title' => $this->t('Weight for @title', array('@title' => $link->getTitle())),
+      '#title' => $this->t('Weight for @title', ['@title' => $link->getTitle()]),
       '#title_display' => 'invisible',
       '#attributes' => [
         'class' => [

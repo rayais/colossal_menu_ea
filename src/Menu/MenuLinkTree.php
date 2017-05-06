@@ -58,7 +58,7 @@ class MenuLinkTree extends CoreMenuLinkTree {
    * {@inheritdoc}
    */
   protected function createInstances(array $data_tree) {
-    $tree = array();
+    $tree = [];
     foreach ($data_tree as $key => $element) {
       $subtree = $this->createInstances($element['subtree']);
       // Build a MenuLinkTreeElement out of the menu tree link definition:

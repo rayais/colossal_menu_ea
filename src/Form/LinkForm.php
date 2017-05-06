@@ -61,7 +61,7 @@ class LinkForm extends ContentEntityForm implements MenuLinkFormInterface {
     $link = $this->entity;
 
     if ($this->operation == 'edit') {
-      $form['#title'] = $this->t('Edit %label', array('%label' => $link->label()));
+      $form['#title'] = $this->t('Edit %label', ['%label' => $link->label()]);
     }
 
     return parent::form($form, $form_state, $link);

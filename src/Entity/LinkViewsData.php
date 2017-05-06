@@ -20,11 +20,11 @@ class LinkViewsData extends EntityViewsData implements EntityViewsDataInterface 
   public function getViewsData() {
     $data = parent::getViewsData();
 
-    $data['colossal_menu_link']['table']['base'] = array(
+    $data['colossal_menu_link']['table']['base'] = [
       'field' => 'id',
       'title' => $this->t('Link'),
       'help' => $this->t('The Link ID.'),
-    );
+    ];
 
     return $data;
   }

@@ -39,7 +39,7 @@ class MenuTreeResource extends BaseMenuTreeResource {
   protected function getBaseRoute($canonical_path, $method) {
     $route = parent::getBaseRoute($canonical_path, $method);
 
-    $parameters = $route->getOption('parameters') ?: array();
+    $parameters = $route->getOption('parameters') ?: [];
     $parameters['colossal_menu']['type'] = 'entity:colossal_menu';
     $route->setOption('parameters', $parameters);
 

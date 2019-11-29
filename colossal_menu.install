@@ -51,3 +51,12 @@ function colossal_menu_schema() {
     ],
   ];
 }
+
+/**
+ * Enable colossal_menu_rest module if rest_menu_tree is enabled.
+ */
+function colossal_menu_update_8001() {
+  if (\Drupal::moduleHandler()->moduleExists('rest_menu_tree')) {
+    \Drupal::service('module_installer')->install(['colossal_menu_rest'], TRUE);
+  }
+}

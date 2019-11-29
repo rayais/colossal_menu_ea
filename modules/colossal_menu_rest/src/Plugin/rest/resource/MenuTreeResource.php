@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\colossal_menu\Plugin\rest\resource;
+namespace Drupal\colossal_menu_rest\Plugin\rest\resource;
 
 use Drupal\rest_menu_tree\Plugin\rest\resource\MenuTreeResource as BaseMenuTreeResource;
 use Symfony\Component\DependencyInjection\ContainerInterface;

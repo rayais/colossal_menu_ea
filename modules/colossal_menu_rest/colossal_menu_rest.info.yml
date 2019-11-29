@@ -1,0 +1,8 @@
+name: 'Colossal Menu Rest Endpoint'
+type: module
+description: 'Provide a REST resource plugin for Colossal Menu Tree'
+core: 8.x
+package: 'Menu'
+dependencies:
+  - rest_menu_tree:rest_menu_tree
+  - colossal_menu:colossal_menu

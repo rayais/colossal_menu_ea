@@ -15,4 +15,4 @@ services:
       - '@router.route_provider'
       - '@menu.active_trail'
       - '@controller_resolver'
-      - '@entity.manager'
+      - '@entity_type.manager'

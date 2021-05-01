@@ -29,7 +29,7 @@ class MenuTreeResource extends BaseMenuTreeResource {
       $container->getParameter('serializer.formats'),
       $container->get('logger.factory')->get('rest'),
       $container->get('colossal_menu.link_tree'),
-      $container->get('entity.manager')
+      $container->get('entity_type.manager')
     );
   }
 

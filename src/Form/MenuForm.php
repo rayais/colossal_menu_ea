@@ -3,7 +3,7 @@
 namespace Drupal\colossal_menu\Form;
 
 use Drupal\Core\Entity\EntityForm;
-use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Menu\MenuLinkTreeInterface;
@@ -19,11 +19,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class MenuForm extends EntityForm {
 
   /**
-   * Entity Manager.
+   * Entity Type Manager.
    *
-   * @var \Drupal\Core\Entity\EntityManagerInterface
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $entityManager;
+  protected $entityTypeManager;
 
   /**
    * Menu Tree.
@@ -35,8 +35,8 @@ class MenuForm extends EntityForm {
   /**
    * Constructor.
    */
-  public function __construct(EntityManagerInterface $entity_manager, MenuLinkTreeInterface $menu_link_tree) {
-    $this->entityManager = $entity_manager;
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, MenuLinkTreeInterface $menu_link_tree) {
+    $this->entityTypeManager = $entity_type_manager;
     $this->menuLinkTree = $menu_link_tree;
   }
 
@@ -45,7 +45,7 @@ class MenuForm extends EntityForm {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('entity.manager'),
+      $container->get('entity_type.manager'),
       $container->get('colossal_menu.link_tree')
     );
   }
@@ -103,17 +103,17 @@ class MenuForm extends EntityForm {
 
     switch ($status) {
       case SAVED_NEW:
-        drupal_set_message($this->t('Created the %label Menu.', [
+        $this->messenger()->addStatus($this->t('Created the %label Menu.', [
           '%label' => $menu->label(),
         ]));
         break;
 
       default:
-        drupal_set_message($this->t('Saved the %label Menu.', [
+        $this->messenger()->addStatus($this->t('Saved the %label Menu.', [
           '%label' => $menu->label(),
         ]));
     }
-    $form_state->setRedirectUrl($menu->urlInfo('collection'));
+    $form_state->setRedirectUrl($menu->toUrl('collection'));
   }
 
   /**
@@ -126,7 +126,7 @@ class MenuForm extends EntityForm {
     $input = $form_state->getUserInput();
 
     foreach ($input['links'] as $id => $input) {
-      $storage = $this->entityManager->getStorage('colossal_menu_link');
+      $storage = $this->entityTypeManager->getStorage('colossal_menu_link');
       $link = $storage->load($id);
 
       $diff = FALSE;
@@ -239,7 +239,7 @@ class MenuForm extends EntityForm {
    * @param int $depth
    *   The current depth.
    */
-  protected function buildLinkElement(&$elements, MenuLinkTreeElement $item, $depth = 0) {
+  protected function buildLinkElement(array &$elements, MenuLinkTreeElement $item, $depth = 0) {
     $id = $item->link->id();
     $link = $item->link;
     $elements[$id] = [

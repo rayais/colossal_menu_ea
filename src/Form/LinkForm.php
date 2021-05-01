@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\colossal_menu\Form\LinkForm.
- */
-
 namespace Drupal\colossal_menu\Form;
 
 use Drupal\Core\Entity\ContentEntityForm;
@@ -76,13 +71,13 @@ class LinkForm extends ContentEntityForm implements MenuLinkFormInterface {
 
     switch ($status) {
       case SAVED_NEW:
-        drupal_set_message($this->t('Created the %label Link.', [
+        $this->messenger()->addStatus($this->t('Created the %label Link.', [
           '%label' => $link->label(),
         ]));
         break;
 
       default:
-        drupal_set_message($this->t('Saved the %label Link.', [
+        $this->messenger()->addStatus($this->t('Saved the %label Link.', [
           '%label' => $link->label(),
         ]));
     }

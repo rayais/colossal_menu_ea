@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\colossal_menu\Entity\Link.
- */
-
 namespace Drupal\colossal_menu\Entity;
 
 use Drupal\Core\Database\Query\Condition;
@@ -570,11 +565,11 @@ class Link extends ContentEntityBase implements LinkInterface {
    * @param string $machine_name
    *   The machine name to load the entity by.
    *
-   * @return \Drupal\colossal_menu\Entity\Link|NULL
+   * @return \Drupal\colossal_menu\Entity\Link|null
    *   Loaded Link entity or NULL if not found.
    */
   public static function loadByMachineName($machine_name) {
-    $storage = \Drupal::service('entity.manager')->getStorage('colossal_menu_link');
+    $storage = \Drupal::service('entity_type.manager')->getStorage('colossal_menu_link');
     $result = $storage->getQuery()
       ->condition('machine_name', $machine_name)
       ->execute();
@@ -600,7 +595,7 @@ class Link extends ContentEntityBase implements LinkInterface {
    * This method is marked private to prevent sub-classes from retrieving
    * services from the container through it.
    *
-   * @return \Symfony\Component\DependencyInjection\ContainerInterface $container
+   * @return \Symfony\Component\DependencyInjection\ContainerInterface
    *   The service container.
    */
   private function container() {

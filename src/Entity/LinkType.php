@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\colossal_menu\Entity\LinkType.
- */
-
 namespace Drupal\colossal_menu\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBundleBase;

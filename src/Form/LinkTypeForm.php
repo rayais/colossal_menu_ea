@@ -1,13 +1,7 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\colossal_menu\Form\LinkTypeForm.
- */
-
 namespace Drupal\colossal_menu\Form;
 
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
 
@@ -17,6 +11,7 @@ use Drupal\Core\Form\FormStateInterface;
  * @package Drupal\colossal_menu\Form
  */
 class LinkTypeForm extends EntityForm {
+
   /**
    * {@inheritdoc}
    */
@@ -56,17 +51,17 @@ class LinkTypeForm extends EntityForm {
 
     switch ($status) {
       case SAVED_NEW:
-        drupal_set_message($this->t('Created the %label Link type.', [
+        $this->messenger()->addStatus($this->t('Created the %label Link type.', [
           '%label' => $colossal_menu_link_type->label(),
         ]));
         break;
 
       default:
-        drupal_set_message($this->t('Saved the %label Link type.', [
+        $this->messenger()->addStatus($this->t('Saved the %label Link type.', [
           '%label' => $colossal_menu_link_type->label(),
         ]));
     }
-    $form_state->setRedirectUrl($colossal_menu_link_type->urlInfo('collection'));
+    $form_state->setRedirectUrl($colossal_menu_link_type->toUrl('collection'));
   }
 
 }

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\colossal_menu\Form\LinkDeleteForm.
- */
-
 namespace Drupal\colossal_menu\Form;
 
 use Drupal\Core\Entity\ContentEntityDeleteForm;

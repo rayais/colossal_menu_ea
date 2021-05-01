@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\colossal_menu\LinkTypeListBuilder.
- */
-
 namespace Drupal\colossal_menu;
 
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
@@ -14,6 +9,7 @@ use Drupal\Core\Entity\EntityInterface;
  * Provides a listing of Link type entities.
  */
 class LinkTypeListBuilder extends ConfigEntityListBuilder {
+
   /**
    * {@inheritdoc}
    */

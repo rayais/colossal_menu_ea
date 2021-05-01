@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\colossal_menu\Plugin\Block\MenuBlock.
- */
-
 namespace Drupal\colossal_menu\Plugin\Block;
 
 use Drupal\system\Plugin\Block\SystemMenuBlock;

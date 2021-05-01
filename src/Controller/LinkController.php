@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains Drupal\colossal_menu\Controller\LinkController.
- */
-
 namespace Drupal\colossal_menu\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
@@ -15,7 +10,8 @@ use Drupal\system\MenuInterface;
 use Drupal\colossal_menu\LinkInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
-
+use Drupal\Core\Link;
+use Drupal\Core\Routing\RouteMatchInterface;
 
 /**
  * Class LinkAddController.
@@ -25,23 +21,56 @@ use Symfony\Component\HttpFoundation\Request;
 class LinkController extends ControllerBase {
 
   /**
-   * Constructor.
+   * Current route match.
+   *
+   * @var \Drupal\Core\Routing\RouteMatchInterface
    */
-  public function __construct(EntityStorageInterface $storage,
-                              EntityStorageInterface $type_storage) {
+  protected $routeMatch;
+
+  /**
+   * Colossal Menu Link storage.
+   *
+   * @var \Drupal\Core\Entity\EntityStorageInterface
+   */
+  protected $storage;
+
+  /**
+   * Colossal Menu Link Type storage.
+   *
+   * @var \Drupal\Core\Entity\EntityStorageInterface
+   */
+  protected $typeStorage;
+
+  /**
+   * LinkController constructor.
+   *
+   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
+   *   Colossal Menu Link storage.
+   * @param \Drupal\Core\Entity\EntityStorageInterface $type_storage
+   *   Colossal Menu Link Type storage.
+   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   *   Current route match.
+   */
+  public function __construct(
+    EntityStorageInterface $storage,
+    EntityStorageInterface $type_storage,
+    RouteMatchInterface $route_match
+  ) {
     $this->storage = $storage;
     $this->typeStorage = $type_storage;
+    $this->routeMatch = $route_match;
   }
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    /** @var EntityManagerInterface $entity_manager */
-    $entity_manager = $container->get('entity.manager');
+    /** @var \Drupal\Core\Entity\EntityTypeManagerInterface $entity_manager */
+    $entity_type_manager = $container->get('entity_type.manager');
     return new static(
-      $entity_manager->getStorage('colossal_menu_link'),
-      $entity_manager->getStorage('colossal_menu_link_type')
+      $entity_type_manager->getStorage('colossal_menu_link'),
+      $entity_type_manager->getStorage('colossal_menu_link_type'),
+      $container->get('current_route_match')
     );
   }
 
@@ -51,7 +80,7 @@ class LinkController extends ControllerBase {
    * Displays add links for available bundles/types for entity
    * colossal_menu_link.
    *
-   * @param \Drupal\colossal_menu\MenuInterface $colossal_menu
+   * @param \Drupal\system\MenuInterface $colossal_menu
    *   An entity representing a custom menu.
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The current request object.
@@ -71,20 +100,19 @@ class LinkController extends ControllerBase {
       return [
         '#markup' => $this->t('You have not created any %bundle types yet. @link to add a new type.', [
           '%bundle' => 'Link',
-          '@link' => $this->l($this->t('Go to the type creation page'), Url::fromRoute('entity.colossal_menu_link_type.add_form')),
+          '@link' => Link::fromTextAndUrl($this->t('Go to the type creation page'), Url::fromRoute('entity.colossal_menu_link_type.add_form')),
         ]),
       ];
     }
 
-    $query = \Drupal::request()->query->all();
     $links = [];
     foreach ($types as $type) {
       $params = [
         'colossal_menu_link_type' => $type->id(),
-        'colossal_menu' => \Drupal::routeMatch()->getParameter('colossal_menu')->id(),
+        'colossal_menu' => $this->routeMatch->getParameter('colossal_menu')->id(),
       ];
       $options = [
-        'query' => \Drupal::request()->query->all(),
+        'query' => $request->query->all(),
       ];
       $url = new Url('entity.colossal_menu_link.add_form', $params, $options);
       $links[$type->id()] = [
@@ -110,9 +138,9 @@ class LinkController extends ControllerBase {
    * Presents the creation form for colossal_menu_link entities of given
    * bundle/type.
    *
-   * @param \Drupal\colossal_menu\MenuInterface $colossal_menu
+   * @param \Drupal\system\MenuInterface $colossal_menu
    *   An entity representing a custom menu.
-   * @param EntityInterface $colossal_menu_link_type
+   * @param \Drupal\Core\Entity\EntityInterface $colossal_menu_link_type
    *   The custom bundle to add.
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The current request object.
@@ -133,14 +161,14 @@ class LinkController extends ControllerBase {
   /**
    * Provides the page title for this controller.
    *
-   * @param EntityInterface $colossal_menu_link_type
+   * @param \Drupal\Core\Entity\EntityInterface $colossal_menu_link_type
    *   The custom bundle/type being added.
    *
    * @return string
    *   The page title.
    */
   public function getAddFormTitle(EntityInterface $colossal_menu_link_type) {
-    return t('Create of bundle @label', [
+    return $this->t('Create of bundle @label', [
       '@label' => $colossal_menu_link_type->label(),
     ]);
   }
@@ -171,7 +199,7 @@ class LinkController extends ControllerBase {
    *   The page title.
    */
   public function getEditFormTitle(LinkInterface $colossal_menu_link) {
-    return t('Edit @label', [
+    return $this->t('Edit @label', [
       '@label' => $colossal_menu_link->label(),
     ]);
   }

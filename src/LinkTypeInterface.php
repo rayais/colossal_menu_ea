@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\colossal_menu\LinkTypeInterface.
- */
-
 namespace Drupal\colossal_menu;
 
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
@@ -14,5 +9,4 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
  */
 interface LinkTypeInterface extends ConfigEntityInterface {
   // Add get/set methods for your configuration properties here.
-
 }

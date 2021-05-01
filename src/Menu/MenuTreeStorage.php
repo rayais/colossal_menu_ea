@@ -1,13 +1,9 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\colossal_menu\Menu\MenuTreeStorage.
- */
-
 namespace Drupal\colossal_menu\Menu;
 
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\Core\Menu\MenuTreeStorageInterface;
@@ -59,10 +55,16 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
    *
    * @param \Drupal\Core\Database\Connection $connection
    *   A Database connection to use for reading and writing configuration data.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The EntityTypeManager service.
+   * @param \Drupal\Core\Routing\RouteMatchInterface $current_route_match
+   *   The currently active route match object.
+   * @param string $entity_type
+   *   The entity type name.
    * @param string $table
    *   A database table name to store configuration data in.
    */
-  public function __construct(Connection $connection, EntityTypeManagerInterface $entity_type_manager, RouteMatchInterface $current_route_match, $entity_type, $table) {
+  public function __construct(Connection $connection, EntityTypeManagerInterface $entity_type_manager, RouteMatchInterface $current_route_match, string $entity_type, string $table) {
     $this->connection = $connection;
     $this->storage = $entity_type_manager->getStorage($entity_type);
     $this->currentRouteMatch = $current_route_match;
@@ -215,7 +217,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
    *   A fully-formed link tree.
    */
   protected function treeDataRecursive(array $flat, array $links, array $depth, array $routes) {
-    uasort($flat, function($a, $b) {
+    uasort($flat, function ($a, $b) {
       return count($a) - count($b);
     });
 
@@ -244,7 +246,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
             unset($tree[$decendent]);
 
             if (count($tree[$id]['subtree']) > 1) {
-              uasort($tree[$id]['subtree'], function($a, $b) {
+              uasort($tree[$id]['subtree'], function ($a, $b) {
                 return ($a['link']->getWeight() < $b['link']->getWeight()) ? -1 : 1;
               });
             }
@@ -254,7 +256,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
     }
 
     if (count($tree) > 1) {
-      uasort($tree, function($a, $b) {
+      uasort($tree, function ($a, $b) {
         return ($a['link']->getWeight() < $b['link']->getWeight()) ? -1 : 1;
       });
     }

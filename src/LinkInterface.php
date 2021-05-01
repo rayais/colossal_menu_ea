@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\colossal_menu\LinkInterface.
- */
-
 namespace Drupal\colossal_menu;
 
 use Drupal\Core\Entity\ContentEntityInterface;

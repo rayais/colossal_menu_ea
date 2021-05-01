@@ -1,16 +1,11 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\colossal_menu\Menu\MenuLinkTree.
- */
-
 namespace Drupal\colossal_menu\Menu;
 
 use Drupal\Core\Access\AccessibleInterface;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Controller\ControllerResolverInterface;
-use Drupal\Core\Entity\EntityManagerInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Menu\MenuActiveTrailInterface;
 use Drupal\Core\Menu\MenuLinkTreeElement;
 use Drupal\Core\Menu\MenuLinkTree as CoreMenuLinkTree;
@@ -23,11 +18,11 @@ use Drupal\Core\Routing\RouteProviderInterface;
 class MenuLinkTree extends CoreMenuLinkTree {
 
   /**
-   * Entity Manager.
+   * Entity Type Manager.
    *
-   * @var \Drupal\Core\Entity\EntityManagerInterface.
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $entityManager;
+  protected $entityTypeManager;
 
   /**
    * Constructs a \Drupal\Core\Menu\MenuLinkTree object.
@@ -40,19 +35,20 @@ class MenuLinkTree extends CoreMenuLinkTree {
    *   The active menu trail service.
    * @param \Drupal\Core\Controller\ControllerResolverInterface $controller_resolver
    *   The controller resolver.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The EntityTypeManager service.
    */
   public function __construct(MenuTreeStorageInterface $tree_storage,
                               RouteProviderInterface $route_provider,
                               MenuActiveTrailInterface $menu_active_trail,
                               ControllerResolverInterface $controller_resolver,
-                              EntityManagerInterface $entity_manager) {
+                              EntityTypeManagerInterface $entity_type_manager) {
     $this->treeStorage = $tree_storage;
     $this->routeProvider = $route_provider;
     $this->menuActiveTrail = $menu_active_trail;
     $this->controllerResolver = $controller_resolver;
-    $this->entityManager = $entity_manager;
+    $this->entityTypeManager = $entity_type_manager;
   }
-
 
   /**
    * {@inheritdoc}
@@ -115,7 +111,7 @@ class MenuLinkTree extends CoreMenuLinkTree {
         $item['has_link'] = FALSE;
       }
 
-      $item['content'] = $this->entityManager->getViewBuilder($link->getEntityTypeId())->view($link, 'default');
+      $item['content'] = $this->entityTypeManager->getViewBuilder($link->getEntityTypeId())->view($link, 'default');
       if (!empty($item['below'])) {
         $this->addItemContent($item['below']);
       }

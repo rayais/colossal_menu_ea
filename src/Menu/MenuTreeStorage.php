@@ -3,7 +3,6 @@
 namespace Drupal\colossal_menu\Menu;
 
 use Drupal\Core\Database\Connection;
-use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\Core\Menu\MenuTreeStorageInterface;

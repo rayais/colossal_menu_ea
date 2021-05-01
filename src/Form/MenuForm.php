@@ -12,7 +12,7 @@ use Drupal\Core\Menu\MenuTreeParameters;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Class MenuForm.
+ * Settings form for menus.
  *
  * @package Drupal\colossal_menu\Form
  */
@@ -127,6 +127,7 @@ class MenuForm extends EntityForm {
 
     foreach ($input['links'] as $id => $input) {
       $storage = $this->entityTypeManager->getStorage('colossal_menu_link');
+      /** @var \Drupal\colossal_menu\Entity\Link $link */
       $link = $storage->load($id);
 
       $diff = FALSE;
@@ -240,8 +241,10 @@ class MenuForm extends EntityForm {
    *   The current depth.
    */
   protected function buildLinkElement(array &$elements, MenuLinkTreeElement $item, $depth = 0) {
-    $id = $item->link->id();
+    /** @var \Drupal\colossal_menu\Entity\Link $link */
     $link = $item->link;
+    $id = $link->id();
+
     $elements[$id] = [
       '#weight' => $link->getWeight(),
     ];

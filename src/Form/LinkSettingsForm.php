@@ -6,7 +6,7 @@ use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Class LinkSettingsForm.
+ * Settings form for Link entities.
  *
  * @package Drupal\colossal_menu\Form
  *

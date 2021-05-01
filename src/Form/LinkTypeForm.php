@@ -6,7 +6,7 @@ use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Class LinkTypeForm.
+ * Settings form for Link types.
  *
  * @package Drupal\colossal_menu\Form
  */

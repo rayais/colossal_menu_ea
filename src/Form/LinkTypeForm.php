@@ -37,8 +37,6 @@ class LinkTypeForm extends EntityForm {
       '#disabled' => !$colossal_menu_link_type->isNew(),
     ];
 
-    /* You will need additional form elements for your custom properties. */
-
     return $form;
   }
 

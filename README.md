@@ -35,7 +35,7 @@ See: https://www.drupal.org/documentation/install/modules-themes/modules-8
 for further information.
 
 ## Requirements
-* [Machine Name Widget](https://www.drupal.org/project/machine_name_widget)
+No special requirements.
 
 ## Setup
 1. Go to https://example.com/admin/structure/colossal_menu/link_type and create

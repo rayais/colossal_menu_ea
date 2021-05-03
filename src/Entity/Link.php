@@ -61,7 +61,7 @@ class Link extends ContentEntityBase implements LinkInterface {
   /**
    * Database Connection.
    *
-   * @var \DatabaseConnection
+   * @var \Drupal\Core\Database\Connection
    */
   protected $connection;
 
@@ -221,26 +221,6 @@ class Link extends ContentEntityBase implements LinkInterface {
       ->setDisplayOptions('form', [
         'type' => 'string_textfield',
         'weight' => -5,
-      ]);
-
-    $fields['machine_name'] = BaseFieldDefinition::create('string')
-      ->setLabel(t('Machine name'))
-      ->setDescription(t('Machine name of the menu link'))
-      ->setRequired(TRUE)
-      ->setSetting('max_length', 255)
-      ->addConstraint('UniqueField', [])
-      ->setDisplayOptions('form', [
-        'type' => 'machine_name',
-        'weight' => -4,
-        'settings' => [
-          'source' => [
-            'title',
-            'widget',
-            0,
-            'value',
-          ],
-          'exists' => '\Drupal\colossal_menu\Entity\Link::loadByMachineName',
-        ],
       ]);
 
     $fields['show_title'] = BaseFieldDefinition::create('boolean')

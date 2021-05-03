@@ -37,7 +37,7 @@
       <ul>
     {% endif %}
     {% for item in items %}
-      <li{{ item.attributes.addClass('link-' ~ item.identifier) }}>
+      <li{{ item.attributes.addClass('colossal-menu-link-' ~ item.identifier) }}>
         {% if item.show_title %}
           {% if item.has_link %}
             {{ link(item.title, item.url) }}

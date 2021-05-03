@@ -3,7 +3,6 @@
 namespace Drupal\colossal_menu\Menu;
 
 use Drupal\Core\Access\AccessibleInterface;
-use Drupal\Component\Utility\Html;
 use Drupal\Core\Controller\ControllerResolverInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Menu\MenuActiveTrailInterface;
@@ -101,10 +100,11 @@ class MenuLinkTree extends CoreMenuLinkTree {
    */
   protected function addItemContent(array &$tree) {
     foreach ($tree as &$item) {
+      /** @var \Drupal\colossal_menu\LinkInterface $link */
       $link = $item['original_link'];
 
       $item['show_title'] = $link->showTitle();
-      $item['identifier'] = Html::cleanCssIdentifier($link->getMachineName());
+      $item['identifier'] = $link->id();
 
       $item['has_link'] = TRUE;
       if (!$link->isExternal() && $link->getRouteName() == '<none>') {

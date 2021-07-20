@@ -30,6 +30,10 @@ use Drupal\colossal_menu\LinkTypeInterface;
  *     "label" = "label",
  *     "uuid" = "uuid"
  *   },
+ *   config_export = {
+ *     "id" = "id",
+ *     "label" = "label"
+ *   },
  *   links = {
  *     "canonical" = "/admin/structure/colossal_menu/link_type/{colossal_menu_link_type}",
  *     "add-form" = "/admin/structure/colossal_menu/link_type/add",

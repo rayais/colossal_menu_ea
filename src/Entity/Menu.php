@@ -30,6 +30,10 @@ use Drupal\system\MenuInterface;
  *     "label" = "label",
  *     "uuid" = "uuid"
  *   },
+ *   config_export = {
+ *     "id" = "id",
+ *     "label" = "label"
+ *   },
  *   links = {
  *     "add-form" = "/admin/structure/colossal_menu/add",
  *     "edit-form" = "/admin/structure/colossal_menu/{colossal_menu}/edit",

@@ -162,11 +162,11 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
     if ($parameters->minDepth > 1) {
       // Since the default depth is 1, and in our storage it's 0, we'll
       // decrement the minimum depth.
-      $query->condition('t.depth', '>=', $parameters->minDepth - 1);
+      $query->condition('t.depth', $parameters->minDepth - 1, '>=');
     }
 
     if ($parameters->maxDepth) {
-      $query->condition('t.depth', '<=', $parameters->maxDepth);
+      $query->condition('t.depth', $parameters->maxDepth, '<=');
     }
 
     $result = $query->execute();

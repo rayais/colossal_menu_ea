@@ -21,7 +21,8 @@
         "drupal/core": "^8.8 || ^9"
     },
     "require-dev": {
-        "drupal/coder": "^8.3"
+        "drupal/coder": "^8.3",
+        "drupal/rest_menu_tree": "^2.0"
     },
     "authors": [
         {

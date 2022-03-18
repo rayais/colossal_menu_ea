@@ -24,7 +24,8 @@ class LinkAccessControlHandler extends EntityAccessControlHandler {
         if (!$entity->isEnabled()) {
           return AccessResult::allowedIfHasPermission($account, 'view disabled colossal_menu_link');
         }
-        return AccessResult::allowedIfHasPermission($account, 'view enabled colossal_menu_link');
+        $url = $entity->getUrlObject();
+        return AccessResult::allowedIf($account->hasPermission('view enabled colossal_menu_link') && $url->access($account));
 
       case 'update':
         return AccessResult::allowedIfHasPermission($account, 'edit colossal_menu_link');

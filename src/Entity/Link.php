@@ -211,10 +211,10 @@ class Link extends ContentEntityBase implements LinkInterface {
       ->setDescription(t('The parent menu item.'))
       ->setSetting('target_type', 'colossal_menu_link')
       ->setSetting('handler', 'default')
-      ->setDisplayOptions('form', array(
+      ->setDisplayOptions('form', [
         'type' => 'options_select',
         'weight' => 5,
-      ))
+      ])
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['title'] = BaseFieldDefinition::create('string')
@@ -226,7 +226,8 @@ class Link extends ContentEntityBase implements LinkInterface {
       ->setDisplayOptions('form', [
         'type' => 'string_textfield',
         'weight' => -5,
-      ]);
+      ])
+      ->setDisplayConfigurable('form', TRUE);
 
     $fields['show_title'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('Show Title'))
@@ -258,16 +259,17 @@ class Link extends ContentEntityBase implements LinkInterface {
       ->setDisplayOptions('form', [
         'settings' => ['display_label' => TRUE],
         'weight' => -1,
-      ]);
+      ])
+      ->setDisplayConfigurable('form', TRUE);
 
     $fields['weight'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Weight'))
       ->setDescription(t('Link weight among links in the same menu at the same depth. In the menu, the links with high weight will sink and links with a low weight will be positioned nearer the top.'))
       ->setDefaultValue(0)
-      ->setDisplayOptions('form', array(
+      ->setDisplayOptions('form', [
         'type' => 'number',
         'weight' => 20,
-      ))
+      ])
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['langcode'] = BaseFieldDefinition::create('language')

@@ -8,8 +8,6 @@ use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Menu\Form\MenuLinkFormInterface;
 use Drupal\Core\Menu\MenuLinkInterface;
-use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
-use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
@@ -44,24 +42,24 @@ class LinkForm extends ContentEntityForm implements MenuLinkFormInterface {
    * @param \Drupal\Component\Datetime\TimeInterface $time
    *   The time service.
    */
-   public function __construct(EntityRepositoryInterface $entity_repository, EntityTypeManagerInterface $entity_type_manager, MenuLinkTree $link_tree, EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL, TimeInterface $time = NULL) {
-     parent::__construct($entity_repository, $entity_type_bundle_info, $time);
-     $this->entityTypeManager = $entity_type_manager;
-     $this->linkTree = $link_tree;
-   }
+  public function __construct(EntityRepositoryInterface $entity_repository, EntityTypeManagerInterface $entity_type_manager, MenuLinkTree $link_tree, EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL, TimeInterface $time = NULL) {
+    parent::__construct($entity_repository, $entity_type_bundle_info, $time);
+    $this->entityTypeManager = $entity_type_manager;
+    $this->linkTree = $link_tree;
+  }
 
-   /**
-    * {@inheritdoc}
-    */
-   public static function create(ContainerInterface $container) {
-     return new static(
-       $container->get('entity.repository'),
-       $container->get('entity_type.manager'),
-       $container->get('colossal_menu.link_tree'),
-       $container->get('entity_type.bundle.info'),
-       $container->get('datetime.time')
-     );
-   }
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('entity.repository'),
+      $container->get('entity_type.manager'),
+      $container->get('colossal_menu.link_tree'),
+      $container->get('entity_type.bundle.info'),
+      $container->get('datetime.time')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -169,7 +167,7 @@ class LinkForm extends ContentEntityForm implements MenuLinkFormInterface {
     $options = ['_none' => '- ' . $this->t('None') . ' -'];
 
     // Load the menu tree for the menu that the link is part of.
-    $tree = $this->linkTree->load($this->entity->getMenuName(), new MenuTreeParameters);
+    $tree = $this->linkTree->load($this->entity->getMenuName(), new MenuTreeParameters());
 
     // Recursively add the parent options as a tree.
     $this->parentSelectOptionsRecursive($options, $tree);
@@ -178,8 +176,9 @@ class LinkForm extends ContentEntityForm implements MenuLinkFormInterface {
   }
 
   /**
-   * Recursive callback to generate the select list options for the link parent
-   * as a tree with depth.
+   * Recursive callback to generate the select list options for the link parent.
+   *
+   * Generates the options as a tree with depth.
    *
    * @param array &$options
    *   The select list options array.

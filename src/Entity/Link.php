@@ -208,9 +208,14 @@ class Link extends ContentEntityBase implements LinkInterface {
 
     $fields['parent'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Parent'))
-      ->setDescription(t('The parent item'))
+      ->setDescription(t('The parent menu item.'))
       ->setSetting('target_type', 'colossal_menu_link')
-      ->setSetting('handler', 'default');
+      ->setSetting('handler', 'default')
+      ->setDisplayOptions('form', array(
+        'type' => 'options_select',
+        'weight' => 5,
+      ))
+      ->setDisplayConfigurable('form', TRUE);
 
     $fields['title'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Title'))
@@ -258,7 +263,12 @@ class Link extends ContentEntityBase implements LinkInterface {
     $fields['weight'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('Weight'))
       ->setDescription(t('Link weight among links in the same menu at the same depth. In the menu, the links with high weight will sink and links with a low weight will be positioned nearer the top.'))
-      ->setDefaultValue(0);
+      ->setDefaultValue(0)
+      ->setDisplayOptions('form', array(
+        'type' => 'number',
+        'weight' => 20,
+      ))
+      ->setDisplayConfigurable('form', TRUE);
 
     $fields['langcode'] = BaseFieldDefinition::create('language')
       ->setLabel(t('Language code'))

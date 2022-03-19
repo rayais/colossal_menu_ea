@@ -62,6 +62,9 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
    *   The entity type name.
    * @param string $table
    *   A database table name to store configuration data in.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
   public function __construct(Connection $connection, EntityTypeManagerInterface $entity_type_manager, RouteMatchInterface $current_route_match, string $entity_type, string $table) {
     $this->connection = $connection;
@@ -109,7 +112,9 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
    * {@inheritdoc}
    */
   public function loadByProperties(array $properties) {
-    return $this->storage->loadByProperties($properties);
+    /** @var \Drupal\colossal_menu\Entity\Link[] $entities */
+    $entities = $this->storage->loadByProperties($properties);
+    return $entities;
   }
 
   /**
@@ -139,7 +144,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
    * {@inheritdoc}
    */
   public function delete($id) {
-    return $this->storage->delete($this->storage->load($id));
+    return $this->storage->delete([$this->storage->load($id)]);
   }
 
   /**

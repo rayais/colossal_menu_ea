@@ -3,6 +3,7 @@
 namespace Drupal\colossal_menu\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\system\MenuInterface;
 
 /**
@@ -69,6 +70,22 @@ class Menu extends ConfigEntityBase implements MenuInterface {
    */
   public function isLocked() {
     return FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function preDelete(EntityStorageInterface $storage, array $entities) {
+    parent::preDelete($storage, $entities);
+    /** @var \Drupal\colossal_menu\Menu\MenuTreeStorage $menu_tree_storage */
+    $menu_tree_storage = \Drupal::service('colossal_menu.tree_storage');
+    foreach ($entities as $menu) {
+      $links = $menu_tree_storage->loadByProperties(['menu' => $menu->id()]);
+      // Delete all links from the menu.
+      foreach ($links as $link) {
+        $link->delete();
+      }
+    }
   }
 
 }

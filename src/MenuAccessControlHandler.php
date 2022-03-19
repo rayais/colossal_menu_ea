@@ -21,10 +21,7 @@ class MenuAccessControlHandler extends EntityAccessControlHandler {
     /** @var \Drupal\colossal_menu\LinkInterface $entity */
     switch ($operation) {
       case 'view':
-        if (!$entity->isEnabled()) {
-          return AccessResult::allowedIfHasPermission($account, 'view disabled colossal_menu');
-        }
-        return AccessResult::allowedIfHasPermission($account, 'view enabled colossal_menu');
+        return AccessResult::allowedIfHasPermission($account, 'view colossal_menu');
 
       case 'update':
         return AccessResult::allowedIfHasPermission($account, 'edit colossal_menu');

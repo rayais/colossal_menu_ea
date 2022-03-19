@@ -42,6 +42,16 @@ function template_preprocess_colossal_menu_link(array &$variables) {
 }
 
 /**
+ * Implements hook_theme_suggestions_HOOK().
+ */
+function colossal_menu_theme_suggestions_colossal_menu_link(array $variables) {
+  $suggestions = [];
+  $colossal_menu_link = $variables['elements']['#colossal_menu_link'];
+  $suggestions[] = str_replace('-', '_', 'colossal_menu_link__' . $colossal_menu_link->bundle());
+  return $suggestions;
+}
+
+/**
  * Implements hook_block_view_BASE_BLOCK_ID_alter().
  */
 function colossal_menu_block_view_colossal_menu_block_alter(array &$build, BlockPluginInterface $block) {

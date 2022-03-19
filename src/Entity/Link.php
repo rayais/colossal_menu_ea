@@ -2,6 +2,7 @@
 
 namespace Drupal\colossal_menu\Entity;
 
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Database\Query\Condition;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
@@ -156,7 +157,15 @@ class Link extends ContentEntityBase implements LinkInterface {
       }
     }
 
-    return parent::postSave($storage, $update);
+    // Entity::postSave() calls Entity::invalidateTagsOnSave(), which only
+    // handles the regular cases. The Colossal Menu Link entity has one special
+    // case: a newly created entity is *also* associated with a Menu, so we must
+    // invalidate the associated Menu's cache tag.
+    if (!$update) {
+      Cache::invalidateTags($this->getCacheTagsToInvalidate());
+    }
+
+    parent::postSave($storage, $update);
   }
 
   /**
@@ -293,10 +302,17 @@ class Link extends ContentEntityBase implements LinkInterface {
   }
 
   /**
+   * Gets the menu the link is attached to.
+   */
+  public function getMenu() {
+    return $this->get('menu')->entity;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function getMenuName() {
-    return $this->get('menu')->entity->id();
+    return $this->getMenu()->id();
   }
 
   /**
@@ -579,6 +595,17 @@ class Link extends ContentEntityBase implements LinkInterface {
       $this->connection = $this->container()->get('database');
     }
     return $this->connection;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheTagsToInvalidate() {
+    if ($menu = $this->getMenu()) {
+      return Cache::mergeTags(parent::getCacheTagsToInvalidate(), $menu->getCacheTagsToInvalidate());
+    }
+
+    return parent::getCacheTagsToInvalidate();
   }
 
   /**

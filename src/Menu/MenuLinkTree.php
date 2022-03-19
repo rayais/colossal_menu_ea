@@ -2,6 +2,7 @@
 
 namespace Drupal\colossal_menu\Menu;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Access\AccessibleInterface;
 use Drupal\Core\Controller\ControllerResolverInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -87,6 +88,17 @@ class MenuLinkTree extends CoreMenuLinkTree {
 
     if (!empty($build['#items'])) {
       $this->addItemContent($build['#items']);
+
+      // Get the menu name from the last link.
+      $item = end($build['#items']);
+      $link = $item['original_link'];
+
+      // Add the menu as a cachable dependency.
+      if ($menu = $link->getMenu()) {
+        $cache = CacheableMetadata::createFromRenderArray($build);
+        $cache->addCacheableDependency($menu);
+        $cache->applyTo($build);
+      }
     }
 
     return $build;

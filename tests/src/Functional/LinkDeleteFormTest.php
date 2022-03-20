@@ -1,15 +1,13 @@
 <?php
 
-namespace Drupal\Tests\colossal_menu\Functional\ColossalMenuLink;
-
-use Drupal\Tests\colossal_menu\Functional\ColossalMenuFunctionalTestBase;
+namespace Drupal\Tests\colossal_menu\Functional;
 
 /**
- * Tests the Colossal Menu Link entity delete UI.
+ * Tests the Link entity delete UI.
  *
  * @group colossal_menu
  */
-class DeleteFormTest extends ColossalMenuFunctionalTestBase {
+class LinkDeleteFormTest extends ColossalMenuFunctionalTestBase {
 
   /**
    * {@inheritdoc}
@@ -21,7 +19,7 @@ class DeleteFormTest extends ColossalMenuFunctionalTestBase {
   }
 
   /**
-   * Tests the MenuLinkContentDeleteForm class.
+   * Tests the LinkDeleteForm class.
    */
   public function testLinkDeleteForm() {
     // Create link.

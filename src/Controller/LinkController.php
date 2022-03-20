@@ -98,9 +98,8 @@ class LinkController extends ControllerBase {
     }
     if (count($types) === 0) {
       return [
-        '#markup' => $this->t('You have not created any %bundle types yet. @link to add a new type.', [
-          '%bundle' => 'Link',
-          '@link' => Link::fromTextAndUrl($this->t('Go to the type creation page'), Url::fromRoute('entity.colossal_menu_link_type.add_form')),
+        '#markup' => $this->t('You have not created any Link types yet. <a href="@url">Add a Link type</a>.', [
+          '@url' => Url::fromRoute('entity.colossal_menu_link_type.add_form')->toString(),
         ]),
       ];
     }

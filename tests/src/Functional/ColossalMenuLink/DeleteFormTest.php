@@ -2,48 +2,28 @@
 
 namespace Drupal\Tests\colossal_menu\Functional\ColossalMenuLink;
 
-use Drupal\colossal_menu\Entity\Link;
-use Drupal\Tests\BrowserTestBase;
+use Drupal\Tests\colossal_menu\Functional\ColossalMenuFunctionalTestBase;
 
 /**
  * Tests the Colossal Menu Link entity delete UI.
  *
  * @group colossal_menu
  */
-class DeleteFormTest extends BrowserTestBase {
-
-  /**
-   * {@inheritdoc}
-   */
-  protected static $modules = ['colossal_menu'];
-
-  /**
-   * {@inheritdoc}
-   */
-  protected $defaultTheme = 'stark';
+class DeleteFormTest extends ColossalMenuFunctionalTestBase {
 
   /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
     parent::setUp();
-    $web_user = $this->drupalCreateUser([
-      'administer colossal_menu_link',
-      'add colossal_menu_link',
-      'delete colossal_menu_link',
-    ]);
-    $this->drupalLogin($web_user);
-
-    $storage = \Drupal::entityTypeManager()->getStorage('colossal_menu');
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
-    $entity = $storage->create(['id' => 'tests', 'label' => 'Tests']);
-    $entity->save();
+    $this->addMenu();
+    $this->addLinkType();
   }
 
   /**
    * Tests the MenuLinkContentDeleteForm class.
    */
-  public function testMenuLinkContentDeleteForm() {
+  public function testLinkDeleteForm() {
     // Create link.
     $this->drupalGet('admin/structure/colossal_menu/tests/link/add');
     $title = 'Front page';
@@ -54,7 +34,7 @@ class DeleteFormTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains("Created the $title Link.");
 
     // Delete link.
-    $link = Link::load(1);
+    $link = \Drupal::entityTypeManager()->getStorage('colossal_menu_link')->load(1);
     $this->drupalGet($link->toUrl('delete-form'));
     $this->assertSession()->pageTextContains("Are you sure you want to delete the link {$link->label()}?");
     $this->assertSession()->linkExists('Cancel');

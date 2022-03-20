@@ -140,13 +140,13 @@ class LinkForm extends ContentEntityForm implements MenuLinkFormInterface {
 
     switch ($status) {
       case SAVED_NEW:
-        $this->messenger()->addStatus($this->t('Created the %label Link.', [
+        $this->messenger()->addStatus($this->t('Link %label created.', [
           '%label' => $link->label(),
         ]));
         break;
 
       default:
-        $this->messenger()->addStatus($this->t('Saved the %label Link.', [
+        $this->messenger()->addStatus($this->t('Link %label updated.', [
           '%label' => $link->label(),
         ]));
     }

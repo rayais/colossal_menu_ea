@@ -167,7 +167,7 @@ class LinkController extends ControllerBase {
    *   The page title.
    */
   public function getAddFormTitle(EntityInterface $colossal_menu_link_type) {
-    return $this->t('Create of bundle @label', [
+    return $this->t('Add @label link', [
       '@label' => $colossal_menu_link_type->label(),
     ]);
   }

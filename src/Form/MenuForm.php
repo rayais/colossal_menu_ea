@@ -113,7 +113,6 @@ class MenuForm extends EntityForm {
           '%label' => $menu->label(),
         ]));
     }
-    $form_state->setRedirectUrl($menu->toUrl('collection'));
   }
 
   /**

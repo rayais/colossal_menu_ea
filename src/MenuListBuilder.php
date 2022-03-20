@@ -29,4 +29,21 @@ class MenuListBuilder extends ConfigEntityListBuilder {
     return $row + parent::buildRow($entity);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getDefaultOperations(EntityInterface $entity) {
+    $operations = parent::getDefaultOperations($entity);
+
+    // Since links are managed from the menu edit page we remove the destination
+    // parameter to make it easier to modify and save link changes quickly.
+    /** @var \Drupal\Core\Url $url */
+    $url = $operations['edit']['url'];
+    $query = $url->getOption('query');
+    unset($query['destination']);
+    $url->setOption('query', $query);
+
+    return $operations;
+  }
+
 }

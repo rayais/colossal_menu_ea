@@ -49,13 +49,13 @@ class LinkTypeForm extends EntityForm {
 
     switch ($status) {
       case SAVED_NEW:
-        $this->messenger()->addStatus($this->t('Created the %label Link type.', [
+        $this->messenger()->addStatus($this->t('Link type %label created.', [
           '%label' => $colossal_menu_link_type->label(),
         ]));
         break;
 
       default:
-        $this->messenger()->addStatus($this->t('Saved the %label Link type.', [
+        $this->messenger()->addStatus($this->t('Link type %label updated.', [
           '%label' => $colossal_menu_link_type->label(),
         ]));
     }

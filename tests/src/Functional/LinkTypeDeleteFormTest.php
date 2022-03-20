@@ -20,7 +20,7 @@ class LinkTypeDeleteFormTest extends ColossalMenuFunctionalTestBase {
   /**
    * Tests the MenuDeleteForm class.
    */
-  public function testMenuDeleteForm() {
+  public function testLinkTypeDeleteForm() {
     $link_type = \Drupal::entityTypeManager()->getStorage('colossal_menu_link_type')->load('test_type');
     $this->drupalGet($link_type->toUrl('delete-form'));
     $this->assertSession()->pageTextContains("Are you sure you want to delete the {$link_type->label()} link type?");

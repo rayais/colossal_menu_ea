@@ -38,7 +38,7 @@ use Drupal\link\LinkItemInterface;
  *     "access" = "Drupal\colossal_menu\LinkAccessControlHandler",
  *   },
  *   base_table = "colossal_menu_link",
- *   admin_permission = "administer link entities",
+ *   admin_permission = "administer colossal_menu_link",
  *   entity_keys = {
  *     "id" = "id",
  *     "bundle" = "type",

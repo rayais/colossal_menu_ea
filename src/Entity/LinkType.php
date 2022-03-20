@@ -23,7 +23,7 @@ use Drupal\colossal_menu\LinkTypeInterface;
  *     },
  *   },
  *   config_prefix = "link_type",
- *   admin_permission = "administer site configuration",
+ *   admin_permission = "administer colossal_menu_link_type",
  *   bundle_of = "colossal_menu_link",
  *   entity_keys = {
  *     "id" = "id",

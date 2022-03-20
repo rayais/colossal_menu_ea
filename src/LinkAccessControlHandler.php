@@ -34,6 +34,7 @@ class LinkAccessControlHandler extends EntityAccessControlHandler {
         return AccessResult::allowedIfHasPermission($account, 'delete colossal_menu_link');
     }
 
+    // @todo Fall back on a less permissive access result.
     return AccessResult::allowed();
   }
 

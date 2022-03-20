@@ -12,7 +12,7 @@ use Drupal\Tests\BrowserTestBase;
  *
  * @group colossal_menu
  */
-class ColossalMenuFunctionalTestBase extends BrowserTestBase {
+abstract class ColossalMenuFunctionalTestBase extends BrowserTestBase {
 
   /**
    * {@inheritdoc}
@@ -30,12 +30,19 @@ class ColossalMenuFunctionalTestBase extends BrowserTestBase {
   protected function setUp(): void {
     parent::setUp();
     $admin = $this->drupalCreateUser([
+      // Menu permissions.
       'colossal_menu overview',
       'add colossal_menu',
       'delete colossal_menu',
       'edit colossal_menu',
       'view colossal_menu',
-      // @todo Remove or refactor this permission -- it is not used anywhere.
+      // Link Type permissions.
+      'administer colossal_menu_link_type',
+      'add colossal_menu_link_type',
+      'delete colossal_menu_link_type',
+      'edit colossal_menu_link_type',
+      'view colossal_menu_link_type',
+      // Link permissions.
       'administer colossal_menu_link',
       'add colossal_menu_link',
       'delete colossal_menu_link',

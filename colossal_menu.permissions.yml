@@ -1,4 +1,4 @@
-# Menu
+# Menu.
 colossal_menu overview:
   title: 'Menu Overview'
   description: "Allow access to the Menu overview form."
@@ -14,6 +14,22 @@ edit colossal_menu:
 
 view colossal_menu:
   title: 'View Menus'
+
+# Link Type.
+administer colossal_menu_link_type:
+  title: 'Administer Link Types'
+
+add colossal_menu_link_type:
+  title: 'Add Link Types'
+
+delete colossal_menu_link_type:
+  title: 'Delete Link Types'
+
+edit colossal_menu_link_type:
+  title: 'Edit Link Types'
+
+view colossal_menu_link_type:
+  title: 'View Link Types'
 
 # Link.
 administer colossal_menu_link:

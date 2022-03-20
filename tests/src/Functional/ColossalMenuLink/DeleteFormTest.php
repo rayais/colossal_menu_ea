@@ -13,9 +13,7 @@ use Drupal\Tests\BrowserTestBase;
 class DeleteFormTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['colossal_menu'];
 
@@ -29,7 +27,11 @@ class DeleteFormTest extends BrowserTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $web_user = $this->drupalCreateUser(['administer colossal_menu_link']);
+    $web_user = $this->drupalCreateUser([
+      'administer colossal_menu_link',
+      'add colossal_menu_link',
+      'delete colossal_menu_link',
+    ]);
     $this->drupalLogin($web_user);
 
     $storage = \Drupal::entityTypeManager()->getStorage('colossal_menu');

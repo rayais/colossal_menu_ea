@@ -191,6 +191,7 @@ class MenuForm extends EntityForm {
       '#sorted' => TRUE,
       '#header' => [
         $this->t('Title'),
+        $this->t('Type'),
         $this->t('Enabled'),
         $this->t('Weight'),
         [
@@ -252,7 +253,6 @@ class MenuForm extends EntityForm {
       $elements[$id]['#attributes']['class'][] = 'draggable';
     }
 
-    $text = [];
     if (!$link->isExternal() && $link->getRouteName() == '<none>') {
       $text = [
         '#plain_text' => $link->getTitle(),
@@ -271,6 +271,8 @@ class MenuForm extends EntityForm {
         $text,
       ],
     ];
+
+    $elements[$id]['bundle'] = ['#plain_text' => $link->get('type')->entity->label()];
 
     if ($link->get('enabled')->access('edit')) {
       $elements[$id]['enabled'] = [

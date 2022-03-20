@@ -9,6 +9,7 @@ use Drupal\Core\Link;
 use Drupal\Core\Menu\MenuLinkTreeInterface;
 use Drupal\Core\Menu\MenuLinkTreeElement;
 use Drupal\Core\Menu\MenuTreeParameters;
+use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -103,16 +104,18 @@ class MenuForm extends EntityForm {
 
     switch ($status) {
       case SAVED_NEW:
-        $this->messenger()->addStatus($this->t('Created the %label Menu.', [
+        $this->messenger()->addStatus($this->t('Menu %label created.', [
           '%label' => $menu->label(),
         ]));
         break;
 
       default:
-        $this->messenger()->addStatus($this->t('Saved the %label Menu.', [
+        $this->messenger()->addStatus($this->t('Menu %label updated.', [
           '%label' => $menu->label(),
         ]));
     }
+
+    $form_state->setRedirectUrl(Url::fromRoute('entity.colossal_menu.collection'));
   }
 
   /**
@@ -122,9 +125,9 @@ class MenuForm extends EntityForm {
    * underneath them. Saving items in the incorrect order can break the tree.
    */
   protected function submitOverviewForm(array $complete_form, FormStateInterface $form_state) {
-    $input = $form_state->getUserInput();
+    $links = $form_state->getUserInput()['links'] ?? [];
 
-    foreach ($input['links'] as $id => $input) {
+    foreach ($links as $id => $input) {
       $storage = $this->entityTypeManager->getStorage('colossal_menu_link');
       /** @var \Drupal\colossal_menu\Entity\Link $link */
       $link = $storage->load($id);

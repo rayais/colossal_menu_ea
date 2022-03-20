@@ -29,7 +29,7 @@ class LinkDeleteFormTest extends ColossalMenuFunctionalTestBase {
       'title[0][value]' => $title,
       'link[0][uri]' => '<front>',
     ], 'Save');
-    $this->assertSession()->pageTextContains("Created the $title Link.");
+    $this->assertSession()->pageTextContains("Link $title created.");
 
     // Delete link.
     $link = \Drupal::entityTypeManager()->getStorage('colossal_menu_link')->load(1);

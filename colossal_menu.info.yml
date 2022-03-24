@@ -1,7 +1,7 @@
 name: Colossal Menu
 type: module
 description: Menu of Epic Proportions.
-core_version_requirement: ^8.8 || ^9
+core_version_requirement: ^9 || ^10
 package: Menu
 
 dependencies:

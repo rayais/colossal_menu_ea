@@ -13,13 +13,6 @@ use Symfony\Component\HttpFoundation\Response;
 class MenuFormTest extends ColossalMenuFunctionalTestBase {
 
   /**
-   * {@inheritdoc}
-   */
-  protected function setUp(): void {
-    parent::setUp();
-  }
-
-  /**
    * Tests adding a Menu.
    */
   public function testAddMenu() {

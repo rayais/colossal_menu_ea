@@ -2,9 +2,6 @@
 
 namespace Drupal\Tests\colossal_menu\Functional;
 
-use Drupal\colossal_menu\Entity\Link;
-use Drupal\colossal_menu\Entity\LinkType;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Tests\BrowserTestBase;
 
 /**
@@ -56,10 +53,8 @@ abstract class ColossalMenuFunctionalTestBase extends BrowserTestBase {
   /**
    * Add a menu entity.
    *
-   * @param $values
+   * @param array $values
    *   Entity values for the menu.
-   *
-   * @return void
    *
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
@@ -76,10 +71,8 @@ abstract class ColossalMenuFunctionalTestBase extends BrowserTestBase {
   /**
    * Add a link type entity.
    *
-   * @param $values
+   * @param array $values
    *   Entity values for the link type.
-   *
-   * @return void
    *
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException

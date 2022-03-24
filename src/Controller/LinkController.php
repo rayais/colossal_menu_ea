@@ -10,7 +10,6 @@ use Drupal\system\MenuInterface;
 use Drupal\colossal_menu\LinkInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Drupal\Core\Link;
 use Drupal\Core\Routing\RouteMatchInterface;
 
 /**

@@ -43,7 +43,7 @@ class LinkFormTest extends ColossalMenuFunctionalTestBase {
   /**
    * Tests editing a Link.
    */
-  public function TestEditLink() {
+  public function testEditLink() {
     $link_type = \Drupal::entityTypeManager()->getStorage('colossal_menu_link_type')->load('test_type');
     $link = \Drupal::entityTypeManager()->getStorage('colossal_menu_link')->create([
       'type' => $link_type->id(),

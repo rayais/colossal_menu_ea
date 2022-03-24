@@ -13,13 +13,6 @@ use Symfony\Component\HttpFoundation\Response;
 class LinkTypeFormTest extends ColossalMenuFunctionalTestBase {
 
   /**
-   * {@inheritdoc}
-   */
-  protected function setUp(): void {
-    parent::setUp();
-  }
-
-  /**
    * Tests adding a Link Type.
    */
   public function testAddLinkType() {

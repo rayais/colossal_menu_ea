@@ -580,6 +580,7 @@ class Link extends ContentEntityBase implements LinkInterface {
     $storage = \Drupal::service('entity_type.manager')->getStorage('colossal_menu_link');
     $result = $storage->getQuery()
       ->condition('machine_name', $machine_name)
+      ->accessCheck(False)
       ->execute();
     return $result ? $storage->loadMultiple($result) : [];
   }

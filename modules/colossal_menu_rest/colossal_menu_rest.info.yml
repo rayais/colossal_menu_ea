@@ -1,7 +1,7 @@
 name: Colossal Menu Rest Endpoint
 type: module
 description: Provide a REST resource plugin for Colossal Menu Tree
-core_version_requirement: ^9 || ^10
+core_version_requirement: ^10 || ^11
 package: Menu
 
 dependencies:

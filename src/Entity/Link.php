@@ -409,6 +409,39 @@ class Link extends ContentEntityBase implements LinkInterface {
   /**
    * {@inheritdoc}
    */
+  public function getResetRoute(): ?\Drupal\Core\Url {
+    // Colossal Menu links don’t have a reset route.
+    return NULL;
+  }
+
+
+    /**
+   * {@inheritdoc}
+   */
+  public function getOperations(): array {
+    $operations = [];
+
+    if ($this->access('update')) {
+      $operations['edit'] = [
+        'title' => t('Edit'),
+        'url' => $this->getEditRoute(),
+      ];
+    }
+
+    if ($this->access('delete')) {
+      $operations['delete'] = [
+        'title' => t('Delete'),
+        'url' => $this->getDeleteRoute(),
+      ];
+    }
+
+    return $operations;
+  }
+
+
+  /**
+   * {@inheritdoc}
+   */
   public function getRouteName() {
     if ($this->getUrlObject()->isRouted()) {
       return $this->getUrlObject()->getRouteName();

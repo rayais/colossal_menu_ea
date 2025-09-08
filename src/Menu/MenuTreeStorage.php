@@ -124,7 +124,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
     $url = new Url($route_name, $route_parameters);
 
     $query = $this->storage->getQuery();
-    $query = accessCheck(False);
+    $query = accessCheck(FALSE);
     $query->condition('link__uri', $url->getUri());
 
     if ($menu_name) {

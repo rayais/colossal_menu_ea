@@ -37,9 +37,9 @@ class LinkForm extends ContentEntityForm implements MenuLinkFormInterface {
    *   The entity manager.
    * @param \Drupal\colossal_menu\Menu\MenuLinkTree $link_tree
    *   The colossal menu link tree.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
+   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface|null $entity_type_bundle_info
    *   The entity type bundle service.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
+   * @param \Drupal\Component\Datetime\TimeInterface|null $time
    *   The time service.
    */
   public function __construct(EntityRepositoryInterface $entity_repository, EntityTypeManagerInterface $entity_type_manager, MenuLinkTree $link_tree, ?EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL, ?TimeInterface $time = NULL) {
